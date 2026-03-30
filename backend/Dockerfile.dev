@@ -1,0 +1,26 @@
+# =========================================
+# Development - ASP.NET Core API
+# =========================================
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS dev
+
+ENV DOTNET_ENVIRONMENT=Development
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
+
+WORKDIR /app
+
+# Copier tous les fichiers projet de la solution
+COPY ["AiReviewHub.Api/AiReviewHub.Api.csproj", "AiReviewHub.Api/"]
+COPY ["AiReviewHub.Domain/AiReviewHub.Domain.csproj", "AiReviewHub.Domain/"]
+COPY ["AiReviewHub.Application/AiReviewHub.Application.csproj", "AiReviewHub.Application/"]
+COPY ["AiReviewHub.Infrastructure/AiReviewHub.Infrastructure.csproj", "AiReviewHub.Infrastructure/"]
+
+# Restaurer toutes les dépendances
+RUN --mount=type=cache,target=/root/.nuget/packages \
+    dotnet restore "AiReviewHub.Api/AiReviewHub.Api.csproj"
+
+# Copier tout le code source
+COPY . .
+
+EXPOSE 8080
+
+CMD ["dotnet", "watch", "--project", "AiReviewHub.Api", "run", "--no-launch-profile"]

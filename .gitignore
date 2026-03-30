@@ -1,0 +1,50 @@
+# ================================
+# Node / Angular
+# ================================
+node_modules/
+dist/
+.angular/
+.angular/cache/
+npm-debug.log
+*.log
+
+# ================================
+# .NET
+# ================================
+bin/
+obj/
+publish/
+**/publish/
+*.user
+*.suo
+*.rsuser
+*.DotSettings.user
+appsettings.Local.json
+**/appsettings.Local.json
+
+# ================================
+# Environnement et secrets
+# ================================
+.env
+.env.*
+!.env.example
+
+# ================================
+# Docker
+# ================================
+docker-volumes/
+
+# ================================
+# IDE
+# ================================
+.vs/
+.vscode/
+.idea/
+
+# ================================
+# OS
+# ================================
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak

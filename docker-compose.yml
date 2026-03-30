@@ -1,0 +1,89 @@
+services:
+
+  # ============================
+  # Backend .NET
+  # ============================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: final
+    container_name: aireviewhub-backend
+    restart: unless-stopped
+    profiles:
+      - prod
+    ports:
+      - "${BACKEND_PORT}:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=${CONNECTION_STRING}
+      - JWT_SECRET=${JWT_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - aireviewhub-network
+
+  # ============================
+  # Frontend Angular
+  # ============================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: runner
+    container_name: aireviewhub-frontend
+    restart: unless-stopped
+    profiles:
+      - prod
+    ports:
+      - "${FRONTEND_PORT}:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - aireviewhub-network
+
+  # ============================
+  # Base de données PostgreSQL
+  # ============================
+  db:
+    image: postgres:17-alpine
+    container_name: aireviewhub-db
+    restart: unless-stopped
+    profiles:
+      - prod
+      - dev
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - aireviewhub-network
+
+# ============================
+# Volumes persistants
+# ============================
+volumes:
+  db-data:
+
+# ============================
+# Réseau interne
+# ============================
+networks:
+  aireviewhub-network:
+    driver: bridge

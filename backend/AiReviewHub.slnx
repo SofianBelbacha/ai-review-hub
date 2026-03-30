@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="AiReviewHub.Api/AiReviewHub.Api.csproj" />
+  <Project Path="AiReviewHub.Application/AiReviewHub.Application.csproj" Id="45f809b8-d5f2-41f8-bd82-f0707cb49681" />
+  <Project Path="AiReviewHub.Domain/AiReviewHub.Domain.csproj" Id="240cc2ef-a860-417d-9a0b-2150a3c1a325" />
+  <Project Path="AiReviewHub.Infrastructure/AiReviewHub.Infrastructure.csproj" Id="c0222813-e6b1-454c-bb7c-a63971b4a156" />
+</Solution>
