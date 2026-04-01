@@ -1,4 +1,5 @@
 ﻿using AiReviewHub.Domain.Abstractions;
+using System.Security.Cryptography;
 
 namespace AiReviewHub.Domain.Entities
 {
@@ -67,7 +68,7 @@ namespace AiReviewHub.Domain.Entities
         }
 
         private static string GenerateToken() =>
-            Guid.NewGuid().ToString("N");
+            Convert.ToHexString(RandomNumberGenerator.GetBytes(16)).ToLower();
 
         private static void ValidateName(string name)
         {

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AiReviewHub.Domain.ValueObjects
 {
-    public sealed class Email
+    public sealed record Email
     {
         public string Value { get; }
 
@@ -35,8 +35,6 @@ namespace AiReviewHub.Domain.ValueObjects
         }
 
         public override string ToString() => Value;
-        public override bool Equals(object? obj) => obj is Email e && e.Value == Value;
-        public override int GetHashCode() => Value.GetHashCode();
     }
 
 }

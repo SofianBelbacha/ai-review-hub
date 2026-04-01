@@ -1,12 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AiReviewHub.Application.Abstractions;
+using AiReviewHub.Domain.Abstractions;
+using AiReviewHub.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace AiReviewHub.Infrastructure.Persistence
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : DbContext, IAppDbContext
     {
+
+        public DbSet<User> Users => Set<User>();
+        public DbSet<Project> Projects => Set<Project>();
+        public DbSet<Feedback> Feedbacks => Set<Feedback>();
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+            => base.SaveChangesAsync(cancellationToken);
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }

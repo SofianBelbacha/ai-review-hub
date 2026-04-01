@@ -1,4 +1,6 @@
-﻿using AiReviewHub.Application;
+﻿using AiReviewHub.Api.Services;
+using AiReviewHub.Application;
+using AiReviewHub.Application.Abstractions;
 using AiReviewHub.Infrastructure;
 
 namespace AiReviewHub.Api
@@ -9,6 +11,10 @@ namespace AiReviewHub.Api
         {
             services.AddApplicationDI()
                 .AddInfrastructureDI(configuration);
+
+            services.AddHttpContextAccessor();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+
 
             return services;
         }

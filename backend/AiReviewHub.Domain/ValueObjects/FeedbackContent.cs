@@ -7,7 +7,7 @@ namespace AiReviewHub.Domain.ValueObjects
     public sealed class FeedbackContent
     {
         public const int MaxLength = 5000;
-        public const int MinLength = 10;
+        public const int MinLength = 5;
 
         public string Value { get; }
 

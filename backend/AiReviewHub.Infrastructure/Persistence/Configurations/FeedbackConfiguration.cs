@@ -37,10 +37,13 @@ namespace AiReviewHub.Infrastructure.Persistence.Configurations
                 .IsRequired();
 
             builder.Property(f => f.AiSummary)
-                .HasMaxLength(500);
+                .HasColumnType("text");
 
             builder.Property(f => f.CreatedAt)
                 .IsRequired();
+
+            builder.HasIndex(f => f.ProjectId);
+            builder.HasIndex(f => f.Status);
         }
     }
 }

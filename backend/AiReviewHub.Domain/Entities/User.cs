@@ -23,7 +23,7 @@ namespace AiReviewHub.Domain.Entities
 
         private User() { }
 
-        public static User Create(string email, string passwordHash, string firstName, string lastName, IDateTimeProvider dateTimeProvider)
+        public static User Create(string email, string passwordHash, string firstName, string lastName, DateTime now)
         {
             if (string.IsNullOrWhiteSpace(firstName))
                 throw new ArgumentException("First name cannot be empty");
@@ -39,7 +39,7 @@ namespace AiReviewHub.Domain.Entities
                 FirstName = firstName.Trim(),
                 LastName = lastName.Trim(),
                 Plan = Plan.Free,
-                CreatedAt = dateTimeProvider.UtcNow
+                CreatedAt = now
             };
         }
 

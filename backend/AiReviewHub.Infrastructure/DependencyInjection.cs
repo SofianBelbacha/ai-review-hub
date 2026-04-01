@@ -1,4 +1,5 @@
-﻿using AiReviewHub.Domain.Abstractions;
+﻿using AiReviewHub.Application.Abstractions;
+using AiReviewHub.Domain.Abstractions;
 using AiReviewHub.Infrastructure.Persistence;
 using AiReviewHub.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,10 @@ namespace AiReviewHub.Infrastructure
             );
 
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+
+            services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
+
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
 
             return services;
         }

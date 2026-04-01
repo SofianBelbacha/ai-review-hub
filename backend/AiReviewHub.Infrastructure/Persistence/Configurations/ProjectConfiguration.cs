@@ -37,6 +37,8 @@ namespace AiReviewHub.Infrastructure.Persistence.Configurations
                 .WithOne(f => f.Project)
                 .HasForeignKey(f => f.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasIndex(p => p.UserId);
         }
     }
 }
