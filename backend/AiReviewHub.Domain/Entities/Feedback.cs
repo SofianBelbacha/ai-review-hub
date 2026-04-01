@@ -28,7 +28,7 @@ namespace AiReviewHub.Domain.Entities
 
         private Feedback() { }
 
-        public static Feedback Create(string content, Guid projectId, IDateTimeProvider dateTimeProvider)
+        public static Feedback Create(string content, Guid projectId, DateTime now)
         {
             if (projectId == Guid.Empty)
                 throw new ArgumentException("ProjectId cannot be empty");
@@ -42,7 +42,7 @@ namespace AiReviewHub.Domain.Entities
                 Status = FeedbackStatus.Todo,
                 AiSummary = string.Empty,
                 ProjectId = projectId,
-                CreatedAt = dateTimeProvider.UtcNow
+                CreatedAt = DateTime.Now
             };
         }
 
@@ -57,17 +57,19 @@ namespace AiReviewHub.Domain.Entities
             UpdatedAt = dateTimeProvider.UtcNow;
         }
 
-        public void UpdateStatus(FeedbackStatus newStatus, IDateTimeProvider dateTimeProvider)
+        public void UpdateStatus(FeedbackStatus newStatus, DateTime now)
         {
             if (Status == newStatus)
-                throw new InvalidOperationException($"Feedback is already in {newStatus} status");
+                throw new InvalidOperationException(
+                    $"Feedback is already in {newStatus} status");
 
-            if (!AllowedTransitions[Status].Contains(newStatus))
+            if (!AllowedTransitions.TryGetValue(Status, out var allowed)
+                || !allowed.Contains(newStatus))
                 throw new InvalidOperationException(
                     $"Cannot transition from {Status} to {newStatus}");
 
             Status = newStatus;
-            UpdatedAt = dateTimeProvider.UtcNow;
+            UpdatedAt = now;
         }
     }
 }

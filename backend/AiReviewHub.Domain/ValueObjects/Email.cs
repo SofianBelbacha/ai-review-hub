@@ -17,8 +17,19 @@ namespace AiReviewHub.Domain.ValueObjects
 
             value = value.Trim().ToLowerInvariant();
 
-            if (!value.Contains('@') || value.Length > 254)
+            if (value.Length > 254)
+                throw new ArgumentException("Email cannot exceed 254 characters");
+
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(value);
+                if (addr.Address != value)
+                    throw new ArgumentException("Email is invalid");
+            }
+            catch (FormatException)
+            {
                 throw new ArgumentException("Email is invalid");
+            }
 
             return new Email(value);
         }
@@ -27,4 +38,5 @@ namespace AiReviewHub.Domain.ValueObjects
         public override bool Equals(object? obj) => obj is Email e && e.Value == Value;
         public override int GetHashCode() => Value.GetHashCode();
     }
+
 }

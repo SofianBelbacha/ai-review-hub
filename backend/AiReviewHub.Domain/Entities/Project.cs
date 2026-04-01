@@ -21,7 +21,7 @@ namespace AiReviewHub.Domain.Entities
 
         private Project() { }
 
-        public static Project Create(string name, string description, Guid userId, IDateTimeProvider dateTimeProvider)
+        public static Project Create(string name, string description, Guid userId, DateTime now)
         {
             ValidateName(name);
             ValidateDescription(description);
@@ -37,7 +37,7 @@ namespace AiReviewHub.Domain.Entities
                 PublicToken = GenerateToken(),
                 IsActive = true,
                 UserId = userId,
-                CreatedAt = dateTimeProvider.UtcNow
+                CreatedAt = DateTime.Now
             };
         }
 
