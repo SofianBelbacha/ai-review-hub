@@ -12,7 +12,6 @@ namespace AiReviewHub.Infrastructure.Persistence
         }
 
         // Ajout des DbSet
-        // public DbSet<Feedback> Feedbacks => Set<Feedback>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

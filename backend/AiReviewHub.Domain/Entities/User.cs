@@ -1,4 +1,6 @@
-﻿using AiReviewHub.Domain.Enums;
+﻿using AiReviewHub.Domain.Abstractions;
+using AiReviewHub.Domain.Enums;
+using AiReviewHub.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -9,37 +11,46 @@ namespace AiReviewHub.Domain.Entities
     public class User
     {
         public Guid Id { get; private set; }
-        public string Email { get; private set; } = string.Empty;
-        public string PasswordHash { get; private set; } = string.Empty;
+        public Email Email { get; private set; } = null!;
+        public PasswordHash PasswordHash { get; private set; } = null!;
         public string FirstName { get; private set; } = string.Empty;
         public string LastName { get; private set; } = string.Empty;
-        public Plan Plan { get; private set; } = Plan.Free;
+        public Plan Plan { get; private set; }
         public DateTime CreatedAt { get; private set; }
         public DateTime? UpdatedAt { get; private set; }
 
-        // Navigation
         public ICollection<Project> Projects { get; private set; } = [];
 
-        private User() { } // Requis par EF Core
+        private User() { }
 
-        public static User Create(string email, string passwordHash, string firstName, string lastName)
+        public static User Create(string email, string passwordHash, string firstName, string lastName, IDateTimeProvider dateTimeProvider)
         {
+            if (string.IsNullOrWhiteSpace(firstName))
+                throw new ArgumentException("First name cannot be empty");
+
+            if (string.IsNullOrWhiteSpace(lastName))
+                throw new ArgumentException("Last name cannot be empty");
+
             return new User
             {
                 Id = Guid.NewGuid(),
-                Email = email.ToLowerInvariant(),
-                PasswordHash = passwordHash,
-                FirstName = firstName,
-                LastName = lastName,
+                Email = Email.Create(email),
+                PasswordHash = PasswordHash.Create(passwordHash),
+                FirstName = firstName.Trim(),
+                LastName = lastName.Trim(),
                 Plan = Plan.Free,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = dateTimeProvider.UtcNow
             };
         }
 
-        public void UpdatePlan(Plan plan)
+        public void UpdatePlan(Plan plan, IDateTimeProvider dateTimeProvider)
         {
+            if (Plan == plan)
+                throw new InvalidOperationException($"User is already on {plan} plan");
+
             Plan = plan;
-            UpdatedAt = DateTime.UtcNow;
+            UpdatedAt = dateTimeProvider.UtcNow;
         }
     }
+
 }

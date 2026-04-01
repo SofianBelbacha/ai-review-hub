@@ -1,4 +1,6 @@
-﻿using AiReviewHub.Infrastructure.Persistence;
+﻿using AiReviewHub.Domain.Abstractions;
+using AiReviewHub.Infrastructure.Persistence;
+using AiReviewHub.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +17,8 @@ namespace AiReviewHub.Infrastructure
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
             );
+
+            services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
             return services;
         }

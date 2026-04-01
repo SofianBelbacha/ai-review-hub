@@ -1,7 +1,12 @@
-﻿namespace AiReviewHub.Domain.Entities
+﻿using AiReviewHub.Domain.Abstractions;
+
+namespace AiReviewHub.Domain.Entities
 {
     public class Project
     {
+        public const int MaxNameLength = 100;
+        public const int MaxDescriptionLength = 500;
+
         public Guid Id { get; private set; }
         public string Name { get; private set; } = string.Empty;
         public string Description { get; private set; } = string.Empty;
@@ -10,32 +15,74 @@
         public DateTime CreatedAt { get; private set; }
         public DateTime? UpdatedAt { get; private set; }
 
-        // Relations
         public Guid UserId { get; private set; }
         public User User { get; private set; } = null!;
         public ICollection<Feedback> Feedbacks { get; private set; } = [];
 
         private Project() { }
 
-        public static Project Create(string name, string description, Guid userId)
+        public static Project Create(string name, string description, Guid userId, IDateTimeProvider dateTimeProvider)
         {
+            ValidateName(name);
+            ValidateDescription(description);
+
+            if (userId == Guid.Empty)
+                throw new ArgumentException("UserId cannot be empty");
+
             return new Project
             {
                 Id = Guid.NewGuid(),
-                Name = name,
-                Description = description,
-                PublicToken = Guid.NewGuid().ToString("N"), // token public pour le widget
+                Name = name.Trim(),
+                Description = description.Trim(),
+                PublicToken = GenerateToken(),
                 IsActive = true,
                 UserId = userId,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = dateTimeProvider.UtcNow
             };
         }
 
-        public void Update(string name, string description)
+        public void Update(string name, string description, IDateTimeProvider dateTimeProvider)
         {
-            Name = name;
-            Description = description;
-            UpdatedAt = DateTime.UtcNow;
+            ValidateName(name);
+            ValidateDescription(description);
+
+            Name = name.Trim();
+            Description = description.Trim();
+            UpdatedAt = dateTimeProvider.UtcNow;
+        }
+
+        public void RegenerateToken(IDateTimeProvider dateTimeProvider)
+        {
+            PublicToken = GenerateToken();
+            UpdatedAt = dateTimeProvider.UtcNow;
+        }
+
+        public void Deactivate(IDateTimeProvider dateTimeProvider)
+        {
+            if (!IsActive)
+                throw new InvalidOperationException("Project is already inactive");
+
+            IsActive = false;
+            UpdatedAt = dateTimeProvider.UtcNow;
+        }
+
+        private static string GenerateToken() =>
+            Guid.NewGuid().ToString("N");
+
+        private static void ValidateName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Project name cannot be empty");
+
+            if (name.Length > MaxNameLength)
+                throw new ArgumentException($"Project name cannot exceed {MaxNameLength} characters");
+        }
+
+        private static void ValidateDescription(string description)
+        {
+            if (description.Length > MaxDescriptionLength)
+                throw new ArgumentException($"Description cannot exceed {MaxDescriptionLength} characters");
         }
     }
+
 }
