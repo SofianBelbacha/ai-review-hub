@@ -20,6 +20,12 @@ namespace AiReviewHub.Application
             // FluentValidation
             services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 
+            // AutoMapper
+            services.AddAutoMapper(cfg =>
+            {
+                cfg.AddMaps(typeof(DependencyInjection).Assembly);
+            });
+
             return services;
         }
     }
