@@ -31,7 +31,7 @@ namespace AiReviewHub.Domain.ValueObjects
                 throw new ArgumentException("Email is invalid");
             }
 
-            return new Email(value);
+            return new Email(value.Trim().ToLowerInvariant());
         }
 
         public override string ToString() => Value;

@@ -1,4 +1,5 @@
 ﻿using AiReviewHub.Application.Abstractions;
+using AiReviewHub.Application.Common.Interfaces;
 using AiReviewHub.Domain.Abstractions;
 using AiReviewHub.Infrastructure.Persistence;
 using AiReviewHub.Infrastructure.Services;
@@ -24,6 +25,9 @@ namespace AiReviewHub.Infrastructure
             services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
 
             services.AddScoped<IPasswordHasher, PasswordHasher>();
+
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
+            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
             return services;
         }

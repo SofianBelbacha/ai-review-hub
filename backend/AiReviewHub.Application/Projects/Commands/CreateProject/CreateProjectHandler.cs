@@ -30,9 +30,7 @@ namespace AiReviewHub.Application.Projects.Commands.CreateProject
             _mapper = mapper;
         }
 
-        public async Task<CreateProjectResult> Handle(
-            CreateProjectCommand request,
-            CancellationToken cancellationToken)
+        public async Task<CreateProjectResult> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
         {
             // Vérifie que l'utilisateur existe
             var user = await _context.Users
