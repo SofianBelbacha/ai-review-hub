@@ -18,25 +18,22 @@ namespace AiReviewHub.Application.Common.Behaviors
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             var requestName = typeof(TRequest).Name;
+            var isSensitive = request is ISensitiveRequest;
 
-            _logger.LogInformation("Handling request {RequestName} {@Request}",
-                requestName, request);
+            if (isSensitive)
+                _logger.LogInformation("Handling sensitive request {RequestName}", requestName);
+            else
+                _logger.LogInformation("Handling request {RequestName} {@Request}", requestName, request);
 
             try
             {
                 var response = await next();
-
-                _logger.LogInformation("Handled request {RequestName}",
-                    requestName);
-
+                _logger.LogInformation("Handled request {RequestName}", requestName);
                 return response;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,
-                    "Error handling request {RequestName} {@Request}",
-                    requestName, request);
-
+                _logger.LogError(ex, "Error handling request {RequestName}", requestName);
                 throw;
             }
         }

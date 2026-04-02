@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using AiReviewHub.Application.Common.Behaviors;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,7 +11,7 @@ namespace AiReviewHub.Application.Users.Commands.RegisterUser
         string Password,
         string FirstName,
         string LastName
-    ) : IRequest<RegisterUserResult>;
+    ) : IRequest<RegisterUserResult>, ISensitiveRequest;
 
     public record RegisterUserResult(
         Guid Id,
