@@ -9,7 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace AiReviewHub.Application.Projects.Commands.CreateProjects
+namespace AiReviewHub.Application.Projects.Commands.CreateProject
 {
     public class CreateProjectHandler : IRequestHandler<CreateProjectCommand, CreateProjectResult>
     {

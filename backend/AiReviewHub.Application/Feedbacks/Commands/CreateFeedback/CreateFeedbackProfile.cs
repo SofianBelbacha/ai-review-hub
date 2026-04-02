@@ -1,15 +1,14 @@
-﻿using AiReviewHub.Application.Feedbacks.Commands.CreateFeedback;
-using AiReviewHub.Domain.Entities;
+﻿using AiReviewHub.Domain.Entities;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace AiReviewHub.Application.Common.Mappings
+namespace AiReviewHub.Application.Feedbacks.Commands.CreateFeedback
 {
-    public class FeedbackMappingProfile : Profile
+    public class CreateFeedbackProfile : Profile
     {
-        public FeedbackMappingProfile()
+        public CreateFeedbackProfile()
         {
             CreateMap<Feedback, CreateFeedbackResult>()
                 .ForMember(dest => dest.Content,
