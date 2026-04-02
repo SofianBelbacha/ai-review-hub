@@ -1,5 +1,4 @@
 ﻿using AiReviewHub.Application.Abstractions;
-using AiReviewHub.Application.Common.Interfaces;
 using AiReviewHub.Domain.Abstractions;
 using AiReviewHub.Domain.Entities;
 using AiReviewHub.Domain.Exceptions;
@@ -59,7 +58,8 @@ namespace AiReviewHub.Application.Users.Commands.RegisterUser
 
             var token = _jwt.GenerateToken(user.Id, user.Email.Value);
 
-            return _mapper.Map<RegisterUserResult>(token);
+            var result = _mapper.Map<RegisterUserResult>(user);
+            return result with { Token = token };
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AiReviewHub.Application.Common.Interfaces
+namespace AiReviewHub.Application.Abstractions
 {
     public interface IJwtTokenGenerator
     {

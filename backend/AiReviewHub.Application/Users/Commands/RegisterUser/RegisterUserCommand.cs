@@ -19,6 +19,7 @@ namespace AiReviewHub.Application.Users.Commands.RegisterUser
         string FirstName,
         string LastName,
         string Plan,
+        string Token,
         DateTime CreatedAt
     );
 }

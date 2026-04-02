@@ -20,7 +20,7 @@ namespace AiReviewHub.Api.Controllers
         public async Task<IActionResult> Register(RegisterUserCommand command)
         {
             var result = await _mediator.Send(command);
-            return Ok(result);
+            return Created(string.Empty, result);
         }
 
         [HttpPost("login")]
