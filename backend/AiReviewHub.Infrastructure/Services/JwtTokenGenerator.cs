@@ -1,4 +1,4 @@
-﻿using AiReviewHub.Application.Common.Interfaces;
+﻿using AiReviewHub.Application.Abstractions;
 using AiReviewHub.Domain.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;

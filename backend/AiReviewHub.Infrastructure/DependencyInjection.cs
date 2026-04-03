@@ -1,5 +1,4 @@
 ﻿using AiReviewHub.Application.Abstractions;
-using AiReviewHub.Application.Common.Interfaces;
 using AiReviewHub.Domain.Abstractions;
 using AiReviewHub.Infrastructure.Persistence;
 using AiReviewHub.Infrastructure.Services;

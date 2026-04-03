@@ -1,5 +1,4 @@
 ﻿using AiReviewHub.Application.Abstractions;
-using AiReviewHub.Application.Common.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
