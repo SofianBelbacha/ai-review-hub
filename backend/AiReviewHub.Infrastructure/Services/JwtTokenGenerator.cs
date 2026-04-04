@@ -1,5 +1,6 @@
 ﻿using AiReviewHub.Application.Abstractions;
 using AiReviewHub.Domain.Abstractions;
+using AiReviewHub.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -21,7 +22,15 @@ namespace AiReviewHub.Infrastructure.Services
             _dateTimeProvider = dateTimeProvider;
         }
 
-        public string GenerateToken(Guid userId, string email)
+        public TokenResult GenerateTokens(Guid userId, string email)
+        {
+            var accessToken = GenerateAccessToken(userId, email);
+            var refreshToken = RefreshToken.Create(userId, _dateTimeProvider.UtcNow);
+
+            return new TokenResult(accessToken, refreshToken.Token);
+        }
+
+        private string GenerateAccessToken(Guid userId, string email)
         {
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)

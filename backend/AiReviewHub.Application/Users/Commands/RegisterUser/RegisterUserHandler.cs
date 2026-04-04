@@ -53,13 +53,23 @@ namespace AiReviewHub.Application.Users.Commands.RegisterUser
                 _dateTimeProvider.UtcNow
             );
 
+            // Génère les deux tokens
+            var tokens = _jwt.GenerateTokens(user.Id, user.Email.Value);
+
+            // Crée et attache le refresh token
+            var refreshToken = RefreshToken.Create(user.Id, _dateTimeProvider.UtcNow);
+            user.RefreshTokens.Add(refreshToken);
+
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync(cancellationToken);
 
-            var token = _jwt.GenerateToken(user.Id, user.Email.Value);
-
             var result = _mapper.Map<RegisterUserResult>(user);
-            return result with { Token = token };
+            return result with
+            {
+                AccessToken = tokens.AccessToken,
+                RefreshToken = tokens.RefreshToken
+            };
         }
     }
 }

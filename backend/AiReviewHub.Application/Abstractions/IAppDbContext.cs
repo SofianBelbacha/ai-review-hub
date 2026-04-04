@@ -11,6 +11,7 @@ namespace AiReviewHub.Application.Abstractions
         DbSet<User> Users { get; }
         DbSet<Project> Projects { get; }
         DbSet<Feedback> Feedbacks { get; }
+        DbSet<RefreshToken> RefreshTokens { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }

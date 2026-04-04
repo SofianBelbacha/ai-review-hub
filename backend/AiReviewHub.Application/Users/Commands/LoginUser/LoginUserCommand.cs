@@ -11,5 +11,5 @@ namespace AiReviewHub.Application.Users.Commands.LoginUser
         string Password
     ) : IRequest<LoginUserResult>, ISensitiveRequest;
 
-    public record LoginUserResult(string Token);
+    public record LoginUserResult(string AccessToken, string RefreshToken);
 }

@@ -21,6 +21,8 @@ namespace AiReviewHub.Domain.Entities
 
         public ICollection<Project> Projects { get; private set; } = [];
 
+        public ICollection<RefreshToken> RefreshTokens { get; private set; } = [];
+
         private User() { }
 
         public static User Create(string email, string passwordHash, string firstName, string lastName, DateTime now)
