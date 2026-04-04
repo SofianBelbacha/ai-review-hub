@@ -12,6 +12,7 @@ namespace AiReviewHub.Application.Feedbacks.Commands.UpdateFeedbackStatus
 {
     public record UpdateFeedbackStatusCommand(
         Guid FeedbackId,
+        Guid ProjectId,
         FeedbackStatus NewStatus
     ) : IRequest<Unit>;
 }

@@ -26,37 +26,35 @@ namespace AiReviewHub.Api.Controllers
             [FromQuery] FeedbackStatus? status,
             [FromQuery] FeedbackCategory? category,
             [FromQuery] FeedbackPriority? priority,
-            CancellationToken cancellationToken)
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20,
+            CancellationToken cancellationToken = default)
         {
             var result = await _mediator.Send(
-                new GetFeedbacksByProjectQuery(projectId, status, category, priority),
+                new GetFeedbacksByProjectQuery(projectId, status, category, priority, page, pageSize),
                 cancellationToken);
 
             return Ok(result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(
-            Guid projectId,
-            [FromBody] CreateFeedbackRequest request,
-            CancellationToken cancellationToken)
+        public async Task<IActionResult> Create(Guid projectId, [FromBody] CreateFeedbackRequest request, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(
                 new CreateFeedbackCommand(request.Content, projectId),
                 cancellationToken);
 
-            return Created($"api/projects/{projectId}/feedbacks/{result.Id}", result);
+            return CreatedAtAction(nameof(GetAll), new { projectId, feedbackId = result.Id }, result);
         }
 
         [HttpPatch("{feedbackId:guid}/status")]
         public async Task<IActionResult> UpdateStatus(
+            Guid projectId,
             Guid feedbackId,
             [FromBody] UpdateFeedbackStatusRequest request,
             CancellationToken cancellationToken)
         {
-            await _mediator.Send(
-                new UpdateFeedbackStatusCommand(feedbackId, request.NewStatus),
-                cancellationToken);
+            await _mediator.Send(new UpdateFeedbackStatusCommand(feedbackId, projectId, request.NewStatus), cancellationToken);
 
             return NoContent();
         }

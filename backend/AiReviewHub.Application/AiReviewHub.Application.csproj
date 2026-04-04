@@ -20,8 +20,4 @@
     <ProjectReference Include="..\AiReviewHub.Domain\AiReviewHub.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Projects\Queries\" />
-  </ItemGroup>
-
 </Project>

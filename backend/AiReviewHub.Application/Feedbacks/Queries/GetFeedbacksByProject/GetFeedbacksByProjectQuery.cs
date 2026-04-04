@@ -1,4 +1,5 @@
-﻿using AiReviewHub.Domain.Enums;
+﻿using AiReviewHub.Application.Common.Models;
+using AiReviewHub.Domain.Enums;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -10,8 +11,10 @@ namespace AiReviewHub.Application.Feedbacks.Queries.GetFeedbacksByProject
         Guid ProjectId,
         FeedbackStatus? StatusFilter = null,
         FeedbackCategory? CategoryFilter = null,
-        FeedbackPriority? PriorityFilter = null
-    ) : IRequest<GetFeedbacksByProjectResult>;
+        FeedbackPriority? PriorityFilter = null,
+        int Page = 1,
+        int PageSize = 20
+    ) : IRequest<PagedResult<FeedbackDto>>;
 
     public record GetFeedbacksByProjectResult(
         IReadOnlyList<FeedbackDto> Feedbacks,

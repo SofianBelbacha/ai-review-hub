@@ -19,22 +19,23 @@ namespace AiReviewHub.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(
-            CreateProjectCommand command,
-            CancellationToken cancellationToken)
+        public async Task<IActionResult> Create([FromBody] CreateProjectRequest request, CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(command, cancellationToken);
-            return Created($"api/projects/{result.Id}", result);
+            var result = await _mediator.Send(new CreateProjectCommand(request.Name, request.Description), cancellationToken);
+
+            return CreatedAtAction(nameof(GetAll), new { id = result.Id }, result);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default)
         {
             var result = await _mediator.Send(
-                new GetProjectsByUserQuery(),
+                new GetProjectsByUserQuery(page, pageSize),
                 cancellationToken);
 
             return Ok(result);
         }
     }
+    public record CreateProjectRequest(string Name, string Description);
+
 }

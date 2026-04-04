@@ -2,6 +2,7 @@
 using AiReviewHub.Application.Users.Commands.RegisterUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AiReviewHub.Api.Controllers
@@ -19,18 +20,34 @@ namespace AiReviewHub.Api.Controllers
 
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register(RegisterUserCommand command)
+        public async Task<IActionResult> Register(
+            [FromBody] RegisterRequest request,
+            CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(command);
+            var command = new RegisterUserCommand(
+                request.Email,
+                request.Password,
+                request.FirstName,
+                request.LastName);
+
+            var result = await _mediator.Send(command, cancellationToken);
             return Created(string.Empty, result);
         }
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginUserCommand command)
+        public async Task<IActionResult> Login(
+            [FromBody] LoginRequest request,
+            CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(command);
+            var command = new LoginUserCommand(request.Email, request.Password);
+            var result = await _mediator.Send(command, cancellationToken);
             return Ok(result);
         }
     }
+
+    public record RegisterRequest(string Email, string Password, string FirstName, string LastName);
+
+    public record LoginRequest(string Email, string Password);
+
 }

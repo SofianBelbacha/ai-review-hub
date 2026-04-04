@@ -1,4 +1,5 @@
 ﻿using AiReviewHub.Application.Abstractions;
+using AiReviewHub.Application.Common.Models;
 using AiReviewHub.Domain.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -8,26 +9,34 @@ using System.Text;
 
 namespace AiReviewHub.Application.Feedbacks.Queries.GetFeedbacksByProject
 {
-    public class GetFeedbacksByProjectHandler
-        : IRequestHandler<GetFeedbacksByProjectQuery, GetFeedbacksByProjectResult>
+    public class GetFeedbacksByProjectHandler : IRequestHandler<GetFeedbacksByProjectQuery, PagedResult<FeedbackDto>>
     {
         private readonly IAppDbContext _context;
+        private readonly ICurrentUserService _currentUser;
 
-        public GetFeedbacksByProjectHandler(IAppDbContext context)
+
+        public GetFeedbacksByProjectHandler(IAppDbContext context, ICurrentUserService currentUser)
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
-        public async Task<GetFeedbacksByProjectResult> Handle(
-            GetFeedbacksByProjectQuery request,
-            CancellationToken cancellationToken)
+        public async Task<PagedResult<FeedbackDto>> Handle(GetFeedbacksByProjectQuery request, CancellationToken cancellationToken)
         {
+            var pageSize = Math.Clamp(request.PageSize, 1, 100);
+            var page = Math.Max(request.Page, 1);
+
             // Vérifie que le projet existe
+
             var projectExists = await _context.Projects
-                .AnyAsync(p => p.Id == request.ProjectId, cancellationToken);
+                .AnyAsync(p =>
+                    p.Id == request.ProjectId &&
+                    p.UserId == _currentUser.UserId,
+                    cancellationToken);
 
             if (!projectExists)
                 throw new NotFoundException($"Project {request.ProjectId} not found");
+
 
             // Construction de la query avec filtres optionnels
             var query = _context.Feedbacks
@@ -43,10 +52,15 @@ namespace AiReviewHub.Application.Feedbacks.Queries.GetFeedbacksByProject
             if (request.PriorityFilter.HasValue)
                 query = query.Where(f => f.Priority == request.PriorityFilter.Value);
 
-            var totalCount = await query.CountAsync(cancellationToken);
+            var total = await query.CountAsync(cancellationToken);
 
             var feedbacks = await query
                 .OrderByDescending(f => f.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            var dtos = feedbacks
                 .Select(f => new FeedbackDto(
                     f.Id,
                     f.Content.Value,
@@ -57,9 +71,9 @@ namespace AiReviewHub.Application.Feedbacks.Queries.GetFeedbacksByProject
                     f.CreatedAt,
                     f.UpdatedAt
                 ))
-                .ToListAsync(cancellationToken);
+                .ToList();
 
-            return new GetFeedbacksByProjectResult(feedbacks, totalCount);
+            return new PagedResult<FeedbackDto>(dtos, PaginationMeta.Create(total, page, pageSize));
         }
     }
 }
