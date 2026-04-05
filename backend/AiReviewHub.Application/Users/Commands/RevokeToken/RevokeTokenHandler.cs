@@ -1,5 +1,6 @@
 ﻿using AiReviewHub.Application.Abstractions;
 using AiReviewHub.Domain.Abstractions;
+using AiReviewHub.Domain.Entities;
 using AiReviewHub.Domain.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -34,14 +35,25 @@ namespace AiReviewHub.Application.Users.Commands.RevokeToken
                 .FirstOrDefaultAsync(u => u.Id == _currentUser.UserId, cancellationToken)
                 ?? throw new NotFoundException("User not found");
 
-            var token = user.RefreshTokens
-                .FirstOrDefault(t => t.Token == request.Token)
-                ?? throw new NotFoundException("Token not found");
+            if (request.RevokeAll)
+            {
+                // Logout global — révoque toutes les sessions
+                foreach (var token in user.RefreshTokens.Where(t => t.IsActive))
+                    token.Revoke(_dateTimeProvider.UtcNow);
+            }
+            else
+            {
+                var tokenHash = RefreshToken.Hash(request.Token);
 
-            if (!token.IsActive)
-                throw new InvalidOperationException("Token is already inactive");
+                var token = user.RefreshTokens
+                    .FirstOrDefault(t => t.TokenHash == tokenHash)
+                    ?? throw new NotFoundException("Token not found");
 
-            token.Revoke(_dateTimeProvider.UtcNow);
+                if (!token.IsActive)
+                    throw new InvalidOperationException("Token is already inactive");
+
+                token.Revoke(_dateTimeProvider.UtcNow);
+            }
             await _context.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;

@@ -39,22 +39,13 @@ namespace AiReviewHub.Application.Users.Commands.LoginUser
 
             var tokens = _jwt.GenerateTokens(user.Id, user.Email.Value);
 
-            // Crée et attache le refresh token
-            var refreshToken = RefreshToken.Create(user.Id, _dateTimeProvider.UtcNow);
-            user.RefreshTokens.Add(refreshToken);
-
-            // Nettoie les anciens refresh tokens expirés
-            var expiredTokens = user.RefreshTokens
-                .Where(t => !t.IsActive)
-                .ToList();
-
-            foreach (var expired in expiredTokens)
-                user.RefreshTokens.Remove(expired);
+            // On attache l'objet RefreshToken directement
+            user.RefreshTokens.Add(tokens.RefreshToken);
 
             await _context.SaveChangesAsync(cancellationToken);
 
 
-            return new LoginUserResult(tokens.AccessToken, tokens.RefreshToken);
+            return new LoginUserResult(tokens.AccessToken, tokens.RawRefreshToken);
         }
     }
 }

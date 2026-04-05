@@ -25,9 +25,9 @@ namespace AiReviewHub.Infrastructure.Services
         public TokenResult GenerateTokens(Guid userId, string email)
         {
             var accessToken = GenerateAccessToken(userId, email);
-            var refreshToken = RefreshToken.Create(userId, _dateTimeProvider.UtcNow);
+            var (refreshTokenEntity, rawToken) = RefreshToken.Create(userId, _dateTimeProvider.UtcNow);
 
-            return new TokenResult(accessToken, refreshToken.Token);
+            return new TokenResult(accessToken, refreshTokenEntity, rawToken);
         }
 
         private string GenerateAccessToken(Guid userId, string email)

@@ -13,11 +13,11 @@ namespace AiReviewHub.Infrastructure.Persistence.Configurations
         {
             builder.HasKey(r => r.Id);
 
-            builder.Property(r => r.Token)
-                .HasMaxLength(100)
+            builder.Property(r => r.TokenHash)
+                .HasMaxLength(64)
                 .IsRequired();
 
-            builder.HasIndex(r => r.Token)
+            builder.HasIndex(r => r.TokenHash)
                 .IsUnique();
 
             builder.Property(r => r.ExpiresAt)
@@ -26,8 +26,8 @@ namespace AiReviewHub.Infrastructure.Persistence.Configurations
             builder.Property(r => r.CreatedAt)
                 .IsRequired();
 
-            builder.Property(r => r.ReplacedByToken)
-                .HasMaxLength(100);
+            builder.Property(r => r.ReplacedByTokenHash)
+                .HasMaxLength(64);
 
             builder.HasOne(r => r.User)
                 .WithMany(u => u.RefreshTokens)

@@ -1,6 +1,8 @@
 using AiReviewHub.Api;
 using AiReviewHub.Api.Middleware;
+using AiReviewHub.Infrastructure.Jobs;
 using AiReviewHub.Infrastructure.Persistence;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -52,11 +54,19 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseHangfireDashboard("/hangfire");
 }
 
 //app.UseHttpsRedirection();
 
 app.UseMiddleware<ExceptionMiddleware>();
+
+
+// Planifie le job toutes les nuits à minuit
+RecurringJob.AddOrUpdate<RefreshTokenCleanupJob>(
+    "cleanup-refresh-tokens",
+    job => job.CleanupExpiredTokens(),
+    Cron.Daily);
 
 app.UseAuthentication();
 

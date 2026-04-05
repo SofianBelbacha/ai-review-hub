@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace AiReviewHub.Domain.Entities
@@ -7,11 +8,11 @@ namespace AiReviewHub.Domain.Entities
     public class RefreshToken
     {
         public Guid Id { get; private set; }
-        public string Token { get; private set; } = string.Empty;
+        public string TokenHash { get; private set; } = string.Empty; // ← hash en DB
         public DateTime ExpiresAt { get; private set; }
         public DateTime CreatedAt { get; private set; }
         public DateTime? RevokedAt { get; private set; }
-        public string? ReplacedByToken { get; private set; }
+        public string? ReplacedByTokenHash { get; private set; }
 
         // Relation
         public Guid UserId { get; private set; }
@@ -23,29 +24,43 @@ namespace AiReviewHub.Domain.Entities
 
         private RefreshToken() { }
 
-        public static RefreshToken Create(Guid userId, DateTime now)
+        public static (RefreshToken Entity, string RawToken) Create(Guid userId, DateTime now)
         {
-            return new RefreshToken
+            var rawToken = GenerateRawToken();
+            var entity = new RefreshToken
             {
                 Id = Guid.NewGuid(),
-                Token = GenerateToken(),
+                TokenHash = Hash(rawToken),
                 ExpiresAt = now.AddDays(7),
                 CreatedAt = now,
                 UserId = userId
             };
+
+            return (entity, rawToken); // raw renvoyé au client, hash stocké en DB
         }
 
-        public void Revoke(DateTime now, string? replacedByToken = null)
+        public void Revoke(DateTime now, string? replacedByRawToken = null)
         {
             if (IsRevoked)
                 throw new InvalidOperationException("Token is already revoked");
 
             RevokedAt = now;
-            ReplacedByToken = replacedByToken;
+            ReplacedByTokenHash = replacedByRawToken is null
+                ? null
+                : Hash(replacedByRawToken);
         }
 
-        private static string GenerateToken() =>
-            Convert.ToBase64String(Guid.NewGuid().ToByteArray()) +
-            Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+        public static string Hash(string rawToken)
+        {
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(rawToken));
+            return Convert.ToHexString(bytes).ToLowerInvariant();
+        }
+
+        private static string GenerateRawToken()
+        {
+            var randomBytes = RandomNumberGenerator.GetBytes(64);
+            return Convert.ToBase64String(randomBytes);
+        }
+
     }
 }

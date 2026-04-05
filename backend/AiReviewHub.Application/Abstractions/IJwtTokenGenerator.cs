@@ -1,10 +1,11 @@
-﻿using System;
+﻿using AiReviewHub.Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace AiReviewHub.Application.Abstractions
 {
-    public record TokenResult(string AccessToken, string RefreshToken);
+    public record TokenResult(string AccessToken, RefreshToken RefreshToken, string RawRefreshToken);
 
     public interface IJwtTokenGenerator
     {

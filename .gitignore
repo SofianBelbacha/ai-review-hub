@@ -48,3 +48,41 @@ docker-volumes/
 Thumbs.db
 *.tmp
 *.bak
+
+# ================================
+# Sécurité — à ajouter
+# ================================
+*.pfx
+*.pem
+*.key
+*.p12
+secrets.json
+**/secrets.json
+UserSecrets/
+
+# ================================
+# .NET — compléments
+# ================================
+*.nupkg
+*.snupkg
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# ================================
+# Angular — compléments  
+# ================================
+.sass-cache/
+connect.lock
+coverage/
+libpeerconnection.log
+npm-debug.log
+yarn-error.log
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions

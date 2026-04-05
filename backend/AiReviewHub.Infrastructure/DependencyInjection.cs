@@ -1,7 +1,10 @@
 ﻿using AiReviewHub.Application.Abstractions;
 using AiReviewHub.Domain.Abstractions;
+using AiReviewHub.Infrastructure.Jobs;
 using AiReviewHub.Infrastructure.Persistence;
 using AiReviewHub.Infrastructure.Services;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,8 +28,20 @@ namespace AiReviewHub.Infrastructure
 
             services.AddScoped<IPasswordHasher, PasswordHasher>();
 
-            services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+            services.AddHangfire(config => config
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(options =>         
+                {
+                    options.UseNpgsqlConnection(
+                        configuration.GetConnectionString("DefaultConnection"));
+                }));
+
+            services.AddHangfireServer();
+            services.AddScoped<RefreshTokenCleanupJob>();
 
             return services;
         }

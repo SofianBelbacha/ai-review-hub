@@ -59,7 +59,7 @@ namespace AiReviewHub.Api.Controllers
         public async Task<IActionResult> Revoke([FromBody] RevokeTokenRequest request, CancellationToken cancellationToken)
         {
             await _mediator.Send(
-                new RevokeTokenCommand(request.Token),
+                new RevokeTokenCommand(request.Token, request.RevokeAll),
                 cancellationToken);
 
             return NoContent();
@@ -70,7 +70,7 @@ namespace AiReviewHub.Api.Controllers
 
     public record LoginRequest(string Email, string Password);
     public record RefreshTokenRequest(string Token);
-    public record RevokeTokenRequest(string Token);
+    public record RevokeTokenRequest(string Token, bool RevokeAll = false);
 
 
 }

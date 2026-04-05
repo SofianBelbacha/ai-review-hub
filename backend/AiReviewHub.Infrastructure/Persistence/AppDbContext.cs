@@ -14,6 +14,7 @@ namespace AiReviewHub.Infrastructure.Persistence
         public DbSet<User> Users => Set<User>();
         public DbSet<Project> Projects => Set<Project>();
         public DbSet<Feedback> Feedbacks => Set<Feedback>();
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
             => base.SaveChangesAsync(cancellationToken);

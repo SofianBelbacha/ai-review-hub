@@ -17,7 +17,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - ConnectionStrings__DefaultConnection=${CONNECTION_STRING}
-      - JWT_SECRET=${JWT_SECRET}
+      - Jwt__Key=${JWT_KEY}
     depends_on:
       db:
         condition: service_healthy

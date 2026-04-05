@@ -56,9 +56,8 @@ namespace AiReviewHub.Application.Users.Commands.RegisterUser
             // Génère les deux tokens
             var tokens = _jwt.GenerateTokens(user.Id, user.Email.Value);
 
-            // Crée et attache le refresh token
-            var refreshToken = RefreshToken.Create(user.Id, _dateTimeProvider.UtcNow);
-            user.RefreshTokens.Add(refreshToken);
+            // On attache l'objet RefreshToken directement
+            user.RefreshTokens.Add(tokens.RefreshToken);
 
 
             _context.Users.Add(user);
@@ -68,7 +67,7 @@ namespace AiReviewHub.Application.Users.Commands.RegisterUser
             return result with
             {
                 AccessToken = tokens.AccessToken,
-                RefreshToken = tokens.RefreshToken
+                RefreshToken = tokens.RawRefreshToken,
             };
         }
     }
