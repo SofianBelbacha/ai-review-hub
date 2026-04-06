@@ -1,1 +1,28 @@
-/* You can add global styles to this file, and also import other style files */
+// ============================================
+// Point d'entrée global
+// ============================================
+
+// 0. Fonts
+@import 'geist/dist/font.css';
+
+// 1. Abstracts — variables et mixins (pas de CSS généré)
+@use 'abstracts/variables';
+@use 'abstracts/mixins' as *;
+//@use 'abstracts/functions';
+
+// 2. Base — reset et typographie
+@use 'base/reset';
+@use 'base/typography';
+
+// 3. Themes
+@use 'themes/light';
+@use 'themes/dark';
+
+// 4. Components
+// @use 'components/buttons';
+// @use 'components/badges';
+// @use 'components/cards';
+
+// 5. Layout
+// @use 'layout/sidebar';
+// @use 'layout/header';
