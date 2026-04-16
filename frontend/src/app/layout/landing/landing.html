@@ -1,0 +1,66 @@
+<main>
+  <section class="hero">
+    <div class="container">
+
+      <!-- Texte + CTA -->
+      <div class="hero-content">
+        <div class="hero__text">
+          <h1 class="hero__title">Centralisez et priorisez vos retours clients grâce à l'IA</h1>
+          <p class="hero__subtitle">
+            AI Review Hub collecte, catégorise et priorise automatiquement les feedbacks de vos clients,
+            pour que vous puissiez vous concentrer sur ce qui compte vraiment.
+          </p>
+        </div>
+
+        <div class="hero__actions">
+          <a routerLink="/register" class="btn btn--primary">Commencer gratuitement</a>
+          <a routerLink="/demo"     class="btn btn--secondary">Voir la démo</a>
+        </div>
+      </div>
+
+      <!-- Aperçu de l'app -->
+      <div class="hero__preview">
+        <nav class="preview__tabs" aria-label="Sections de l'application">
+          @for (tab of tabs; track tab) {
+            <button
+              class="preview__tab"
+              [class.preview__tab--active]="activeTab() === tab"
+              (click)="setActiveTab(tab)">
+              {{ tab }}
+            </button>
+          }
+        </nav>
+
+        <div class="preview__screen">
+          <img
+            src="https://framerusercontent.com/images/bAsadDlMyvGtPLrtxtIqvdEeE.png"
+            alt="Tableau de bord AI Review Hub — vue kanban des feedbacks."
+            width="1200"
+            height="750"
+            loading="eager"
+            decoding="async">
+        </div>
+      </div>
+
+      <!-- Social proof -->
+      <div class="trust">
+        <p class="trust__label">Adopté par des équipes innovantes partout dans le monde</p>
+        <div class="trust__container">
+          <div class="trust__logos">
+            <img src="https://framerusercontent.com/images/c0hI1bbMHhU5EFJZ7kGSjpoaw.png" alt="Accenture"  class="trust__logo">
+            <img src="https://framerusercontent.com/images/JKiVrgSpVxkaCsrrWcEv8NWmKA.png" alt="Procurify" class="trust__logo">
+            <img src="https://framerusercontent.com/images/RDFvpM8oV0XiXpoKL71Zu1xHr4M.png" alt="Cloudstaff" class="trust__logo">
+            <img src="https://framerusercontent.com/images/dY7wKtAxE7tS89SKDTT12QLDlg.png" alt="KPMG"      class="trust__logo">
+            <img src="https://framerusercontent.com/images/P1UJMMnBwzachlcwnaE7VXPBzVs.png" alt="Amber"     class="trust__logo">
+          </div>
+          <div class="trust__logos">
+            <img src="https://framerusercontent.com/images/ZfvXT9v9k0ZU3MLcabPstm7jho.png" alt="Apress"     class="trust__logo">
+            <img src="https://framerusercontent.com/images/WrNigRJQqmF58VOtqCPpjUangw.png" alt="10up"       class="trust__logo">
+            <img src="https://framerusercontent.com/images/rXKXRsDqKVxw6122ZmSUMyOtVbg.png" alt="Partywave" class="trust__logo">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
