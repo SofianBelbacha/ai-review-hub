@@ -50,6 +50,77 @@
 }
 
 /* =============================================
+   ANNOUNCEMENT BADGE
+   ============================================= */
+.badge {
+    border: 1px solid rgb(239, 239, 240);
+    border-radius: 20px;
+    padding: 4px;
+
+  
+}
+.badge-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgb(220, 220, 221);
+  background-color: rgb(239, 239, 240);
+  text-decoration: none;
+  color: var(--color-dark);
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.18);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+
+    .badge__arrow {
+      transform: translateX(2px);
+    }
+  }
+}
+
+/* Pastille colorée "Nouveau" à gauche */
+
+
+.badge__tag-icon {
+  width: 20px;
+  color: var(--color-dark);
+  flex-shrink: 0;
+}
+
+/* Texte principal */
+
+.badge__text {
+  font-family: var(--font-base);
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--color-dark);
+  white-space: nowrap;
+}
+
+/* Flèche droite */
+
+.badge__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+
+  svg {
+    width: 12px;
+    height: 9px;
+    color: var(--color-muted);
+  }
+}
+
+/* =============================================
    APP PREVIEW
    ============================================= */
 
