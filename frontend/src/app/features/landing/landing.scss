@@ -432,3 +432,190 @@
  
   .feature-card__image { height: 160px !important; }
 }
+
+// =============================================
+// WORKFLOW — grande carte + mini-cartes
+// =============================================
+ 
+.workflow { padding: 96px 0; }
+ 
+// Grande carte centrale
+ 
+.workflow__hero-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  padding: 56px 48px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface-lt);
+  margin-bottom: 16px;
+  text-align: center;
+}
+ 
+.workflow__hero-title {
+  font-family: var(--font-base);
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--color-dark);
+  max-width: 680px;
+}
+ 
+.workflow__hero-image {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+}
+ 
+.workflow__hero-image-bg {
+  position: absolute;
+  inset: 16px -16px -16px;
+  background-color: var(--color-border);
+  border-radius: var(--radius-card);
+  z-index: 0;
+}
+ 
+.workflow__hero-image-frame {
+  position: relative;
+  z-index: 1;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+ 
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+}
+ 
+.workflow__hero-quote {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--color-muted);
+  max-width: 560px;
+}
+ 
+// Grille de mini-cartes
+ 
+.workflow__grid { width: 100%; }
+ 
+.workflow__grid-col {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+ 
+.workflow__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+ 
+  // Séparateur horizontal entre les 2 rangées
+  & + & {
+    border-top: 1px solid var(--color-border);
+  }
+}
+ 
+// Mini-carte
+ 
+.wf-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px 28px 32px;
+  transition: background 0.15s ease;
+ 
+  // Séparateurs verticaux entre cartes de la même rangée
+  & + & { border-left: 1px solid var(--color-border); }
+ 
+  &:hover { background-color: var(--color-surface-lt); }
+}
+ 
+.wf-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+ 
+  svg { width: 20px; height: 20px; color: var(--color-dark); }
+}
+ 
+.wf-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+ 
+.wf-card__title {
+  font-family: var(--font-medium);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--color-dark);
+}
+ 
+.wf-card__text {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-muted);
+}
+ 
+ 
+// =============================================
+// RESPONSIVE
+// =============================================
+ 
+@media (max-width: 1199px) {
+  .hero__title        { font-size: 48px; line-height: 1.167; }
+  .hero__subtitle     { font-size: 18px; line-height: 26px; }
+  .features__title    { font-size: 40px; }
+  .workflow__hero-title { font-size: 32px; }
+ 
+  .features__row--3 {
+    grid-template-columns: 1fr 1fr;
+ 
+    .feature-card:last-child {
+      grid-column: 1 / -1;
+      .feature-card__image { height: 180px; }
+    }
+  }
+}
+ 
+@media (max-width: 767px) {
+  .hero-content       { padding: 100px 0 48px; }
+  .hero__title        { font-size: 40px; line-height: 1.2; }
+  .hero__subtitle     { font-size: 16px; line-height: 24px; }
+  .preview__tabs      { display: none; }
+  .trust__logo        { height: 22px; width: auto; }
+ 
+  .features           { padding: 64px 0; }
+  .features__header   { margin-bottom: 40px; }
+  .features__title    { font-size: 32px; }
+  .features__subtitle { font-size: 16px; }
+ 
+  .features__row--2,
+  .features__row--3   {
+    grid-template-columns: 1fr;
+    .feature-card:last-child { grid-column: auto; }
+  }
+  .feature-card__image { height: 160px !important; }
+ 
+  .workflow           { padding: 64px 0; }
+  .workflow__hero-card { padding: 32px 24px; gap: 28px; }
+  .workflow__hero-title { font-size: 26px; }
+  .workflow__hero-quote { font-size: 15px; }
+ 
+  .workflow__row { grid-template-columns: 1fr; }
+  .wf-card + .wf-card { border-left: none; border-top: 1px solid var(--color-border); }
+}
