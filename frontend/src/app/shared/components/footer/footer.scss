@@ -1,0 +1,212 @@
+/* =============================================
+   FOOTER — styles scopés au composant
+   ============================================= */
+
+.footer {
+  padding: 64px 0 0;
+}
+
+// -----------------------------------------------
+// Corps principal : brand | colonnes de liens
+// -----------------------------------------------
+
+.footer__body {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 64px;
+  padding-bottom: 56px;
+}
+
+// Colonne gauche
+
+.footer__brand {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.footer__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-dark);
+  text-decoration: none;
+}
+
+.footer__logo-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.footer__logo-text {
+  font-family: var(--font-medium);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.footer__tagline {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-muted);
+  max-width: 240px;
+}
+
+// Icônes sociales
+
+.footer__socials {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.footer__social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--color-dark);
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    background-color: var(--color-surface);
+    color: var(--color-dark);
+  }
+}
+
+.footer__social-sep {
+  width: 1px;
+  height: 20px;
+  background-color: var(--color-border);
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+// Colonnes de navigation
+
+.footer__nav {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+}
+
+.footer__col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer__col-title {
+  font-family: var(--font-medium);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.footer__col-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer__link {
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--color-muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-dark);
+  }
+}
+
+// -----------------------------------------------
+// Barre de copyright
+// -----------------------------------------------
+
+.footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.footer__copyright {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.footer__bottom-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-muted);
+
+  .footer__link {
+    font-size: 13px;
+  }
+}
+
+// =============================================
+// RESPONSIVE
+// =============================================
+
+@media (max-width: 1199px) {
+  .footer__body {
+    grid-template-columns: 220px 1fr;
+    gap: 40px;
+  }
+
+  .footer__nav {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .footer {
+    padding-top: 48px;
+  }
+
+  .footer__body {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding-bottom: 40px;
+  }
+
+  .footer__tagline {
+    max-width: 100%;
+  }
+
+  .footer__nav {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px 16px;
+  }
+
+  .footer__bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .footer__bottom-links {
+    flex-wrap: wrap;
+  }
+}
