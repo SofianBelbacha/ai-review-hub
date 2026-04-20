@@ -259,16 +259,50 @@
 // =============================================
  
 .features {
-  padding: 96px 0;
+  padding: 120px 0;
 }
- 
+
+.features .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 64px;
+    justify-content: center;
+}
+
+.features__row--2 .feature-card:nth-child(1){
+  border-radius: 36px 8px 8px;
+}
+
+.features__row--2 .feature-card:nth-child(2){
+  border-radius: 8px 36px 8px 8px;
+}
+
+.features__row--3 .feature-card:nth-child(1){
+  border-radius: 8px 8px 8px 36px;
+}
+
+.features__row--3 .feature-card:nth-child(3){
+  border-radius: 8px 8px 36px;
+}
+
+.features__row--2 .feature-card{
+  width: 504px;
+  height: 392px;
+}
+
+.features__row--3 .feature-card{
+  width: 332px;
+  height: 340px;
+}
+
 .features__header {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
   max-width: 640px;
-  margin: 0 auto 64px;
+  margin: 0 64px;
   text-align: center;
 }
  
@@ -290,11 +324,13 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: min-content;
 }
  
 .features__row {
   display: grid;
   gap: 16px;
+  width: min-content;
  
   &--2 { grid-template-columns: 1fr 1fr; }
   &--3 { grid-template-columns: 1fr 1fr 1fr; }
@@ -307,7 +343,7 @@
   flex-direction: column;
   border-radius: var(--radius-card);
   border: 1px solid var(--color-border);
-  background-color: var(--color-white);
+  background-color: rgb(239, 239, 240);
   overflow: hidden;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
  
@@ -370,8 +406,8 @@
 }
  
 .feature-card__title {
-  font-family: var(--font-medium);
-  font-size: 16px;
+  font-family: var(--font-base);
+  font-size: 18px;
   font-weight: 500;
   line-height: 1.3;
   color: var(--color-dark);
@@ -379,7 +415,7 @@
 }
  
 .feature-card__text {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.55;
   color: var(--color-muted);
   text-align: center;
@@ -437,44 +473,58 @@
 // WORKFLOW — grande carte + mini-cartes
 // =============================================
  
-.workflow { padding: 96px 0; }
- 
-// Grande carte centrale
- 
-.workflow__hero-card {
+.workflow { 
+  align-items: center;
+  background-color: rgb(247, 247, 248);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 40px;
-  padding: 56px 48px;
-  border-radius: var(--radius-card);
-  border: 1px solid var(--color-border);
-  background-color: var(--color-surface-lt);
-  margin-bottom: 16px;
-  text-align: center;
+  justify-content: center;
+  
+}
+ 
+// Grande carte centrale
+
+.workflow__hero-card {
+    align-content: center;
+    align-items: center;
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 64px;
+    height: min-content;
+    justify-content: center;
+    overflow: hidden;
+    padding: 120px 0 0;
 }
  
 .workflow__hero-title {
   font-family: var(--font-base);
-  font-size: 40px;
+  font-size: 48px;
   font-weight: 400;
   line-height: 1.2;
   color: var(--color-dark);
   max-width: 680px;
+  text-align: center;
 }
  
 .workflow__hero-image {
   position: relative;
   width: 100%;
-  max-width: 800px;
+  max-width: 750px;
 }
- 
+
 .workflow__hero-image-bg {
-  position: absolute;
-  inset: 16px -16px -16px;
-  background-color: var(--color-border);
-  border-radius: var(--radius-card);
-  z-index: 0;
+    background-color: rgb(239, 239, 240);
+    border-radius: 12px;
+    flex: none;
+    height: 310px;
+    left: calc(50.00000000000002% - 648px / 2);
+    overflow: hidden;
+    position: absolute;
+    top: -18px;
+    width: 648px;
+    will-change: var(--framer-will-change-override, transform);
 }
  
 .workflow__hero-image-frame {
@@ -494,15 +544,34 @@
 }
  
 .workflow__hero-quote {
-  font-size: 18px;
+  font-size: 32px;
   line-height: 1.6;
-  color: var(--color-muted);
-  max-width: 560px;
+  max-width: 800px;
+  text-align: center;
 }
+
+// Background workflow section
+
+/*.workflow__background {
+  image-rendering: pixelated;
+  fill: rgb(220, 220, 221);
+  color: rgb(220, 220, 221);
+  height: 801px;
+  width: 1136px;
+  position: relative;
+}
+
+.workflow__background svg {
+  flex: none;
+  height: 100%;
+  width: 100%;
+  position: relative;
+
+}*/
  
-// Grille de mini-cartes
+// Grille de mini-cartes  
  
-.workflow__grid { width: 100%; }
+.workflow__grid { width: 100%; padding-bottom: 120px; }
  
 .workflow__grid-col {
   display: flex;
@@ -510,46 +579,42 @@
   border-radius: var(--radius-card);
   border: 1px solid var(--color-border);
   overflow: hidden;
+  width: 1136px;
+  margin: auto;
 }
  
 .workflow__row {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
+
  
   // Séparateur horizontal entre les 2 rangées
   & + & {
     border-top: 1px solid var(--color-border);
   }
 }
- 
+  
 // Mini-carte
  
 .wf-card {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 28px 28px 32px;
+  padding: 64px 32px 32px;
   transition: background 0.15s ease;
- 
+  height: 240px;
+  position: relative;
+  width: 378px;
+
+
   // Séparateurs verticaux entre cartes de la même rangée
   & + & { border-left: 1px solid var(--color-border); }
  
   &:hover { background-color: var(--color-surface-lt); }
 }
  
-.wf-card__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  flex-shrink: 0;
- 
-  svg { width: 20px; height: 20px; color: var(--color-dark); }
-}
+.wf-card__icon svg { width: 40px; height: 40px; color: var(--color-dark); }
+
  
 .wf-card__content {
   display: flex;
@@ -558,15 +623,15 @@
 }
  
 .wf-card__title {
-  font-family: var(--font-medium);
-  font-size: 15px;
+  font-family: var(--font-base);
+  font-size: 18px;
   font-weight: 500;
   line-height: 1.3;
   color: var(--color-dark);
 }
  
 .wf-card__text {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.55;
   color: var(--color-muted);
 }
@@ -635,6 +700,8 @@
   border-radius: 36px;
   border: 1px solid var(--color-border);
   overflow: hidden;
+  padding: 100px 0;
+  border-radius: 36px;
 }
  
 // Colonne gauche
@@ -644,7 +711,7 @@
   flex-direction: column;
   justify-content: center;
   gap: 32px;
-  padding: 56px 48px;
+  padding: 64px 24px 64px 100px;
   border-top: 1px solid var(--color-border);
 }
  
@@ -656,7 +723,7 @@
  
 .cta__title {
   font-family: var(--font-base);
-  font-size: 40px;
+  font-size: 48px;
   font-weight: 400;
   line-height: 1.2;
   color: var(--color-dark);

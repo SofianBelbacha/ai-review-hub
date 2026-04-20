@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Footer } from '../../shared/components/footer/footer';
 
 export interface FeatureCard {
   id: string;
@@ -19,7 +20,7 @@ export interface WorkflowCard {
 
 @Component({
   selector: 'app-landing',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, Footer],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
 })
