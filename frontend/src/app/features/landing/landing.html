@@ -1,7 +1,7 @@
 <main>
-    <!-- =============================================
-       HERO
-       ============================================= -->
+  <!-- =============================================
+      HERO
+      ============================================= -->
   <section class="hero">
     <div class="container">
 
@@ -79,9 +79,10 @@
 
     </div>
   </section>
-    <!-- =============================================
-       FEATURES
-       ============================================= -->
+
+  <!-- =============================================
+      FEATURES
+      ============================================= -->
   <section class="features">
     <div class="container">
  
@@ -127,9 +128,9 @@
     </div>
   </section>
 
-    <!-- =============================================
-       WORKFLOW — grande carte centrale + mini-cartes
-       ============================================= -->
+  <!-- =============================================
+      WORKFLOW — grande carte centrale + mini-cartes
+      ============================================= -->
   <section class="workflow">
     <div class="workflow__hero-card">
       <h2 class="workflow__hero-title">
@@ -233,9 +234,9 @@
     </div>
   </section>
 
-    <!-- =============================================
-       PRICING
-       ============================================= -->
+  <!-- =============================================
+      PRICING
+      ============================================= -->
   <section class="pricing">
     <div class="container">
  
@@ -296,9 +297,68 @@
     </div>
   </section>
 
-    <!-- =============================================
-       CTA — grande carte finale
-       ============================================= -->
+  <!-- =============================================
+      FAQ
+      ============================================= -->
+  <section class="faq">
+    <div class="container">
+ 
+      <div class="faq__layout">
+ 
+        <!-- Colonne gauche : titre fixe -->
+        <div class="faq__aside">
+          <h2 class="faq__title">Questions<br>fréquentes</h2>
+          <p class="faq__subtitle">
+            Vous ne trouvez pas ce que vous cherchez ?
+          </p>
+          <a routerLink="/contact" class="faq__contact">
+            Contactez-nous
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 8h10M9 4l4 4-4 4"/>
+            </svg>
+          </a>
+        </div>
+ 
+        <!-- Colonne droite : accordéon -->
+        <div class="faq__list" role="list">
+          @for (faq of faqs; track faq.id) {
+            <div
+              class="faq-item"
+              [class.faq-item--open]="openFaqId() === faq.id"
+              role="listitem">
+ 
+              <button
+                class="faq-item__trigger"
+                type="button"
+                [attr.aria-expanded]="openFaqId() === faq.id"
+                [attr.aria-controls]="faq.id"
+                (click)="toggleFaq(faq.id)">
+                <span class="faq-item__question">{{ faq.question }}</span>
+                <span class="faq-item__icon" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 6l4 4 4-4"/>
+                  </svg>
+                </span>
+              </button>
+ 
+              <div
+                class="faq-item__body"
+                [id]="faq.id"
+                role="region">
+                <p class="faq-item__answer">{{ faq.answer }}</p>
+              </div>
+ 
+            </div>
+          }
+        </div>
+ 
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================
+      CTA — grande carte finale
+      ============================================= -->
   <section class="cta">
     <div class="container">
       <div class="cta-container-card">
@@ -340,6 +400,7 @@
     </div>
     </div>
   </section>
+  
   <app-footer></app-footer>
 
 </main>

@@ -30,6 +30,12 @@ export interface PricingPlan {
   features: string[];
 }
 
+export interface FaqItem {
+  id: string;
+  question: string;
+  answer: string;
+}
+
 
 @Component({
   selector: 'app-landing',
@@ -195,6 +201,47 @@ export class Landing {
   ];
 
 
+  // -----------------------------------------------
+  // FAQ — état d'ouverture géré avec un signal
+  // -----------------------------------------------
+  openFaqId = signal<string | null>(null);
+ 
+  toggleFaq(id: string): void {
+    this.openFaqId.update(current => current === id ? null : id);
+  }
+ 
+  faqs: FaqItem[] = [
+    {
+      id: 'faq-1',
+      question: 'Comment fonctionne l\'analyse IA des feedbacks ?',
+      answer: 'Dès qu\'un retour est soumis via le widget ou le lien public, notre backend l\'envoie à l\'API OpenAI. En quelques secondes, l\'IA retourne trois informations : la catégorie du retour (bug, feature request ou question), un résumé en une phrase claire, et un score de priorité calculé à partir de l\'analyse du sentiment. Ces données enrichissent automatiquement votre kanban.',
+    },
+    {
+      id: 'faq-2',
+      question: 'Mes clients ont-ils besoin de créer un compte pour soumettre un retour ?',
+      answer: 'Non, c\'est l\'un de nos partis pris forts. Votre client accède à un lien public ou interagit avec un widget JavaScript intégré directement sur son site. Il remplit un simple formulaire et soumet son retour — sans inscription, sans mot de passe, sans friction.',
+    },
+    {
+      id: 'faq-3',
+      question: 'Quelle est la différence entre le plan Free et le plan Pro ?',
+      answer: 'Le plan Free autorise 1 projet actif et jusqu\'à 50 feedbacks par mois, ce qui est suffisant pour tester la plateforme avec un premier client. Le plan Pro (9 €/mois) débloque 10 projets, les feedbacks illimités, les filtres avancés, l\'export CSV et le graphique de tendances. Le plan Team ajoute la gestion multi-membres et les intégrations tierces.',
+    },
+    {
+      id: 'faq-4',
+      question: 'Puis-je annuler mon abonnement à tout moment ?',
+      answer: 'Oui, sans engagement ni frais cachés. Vous pouvez annuler depuis votre espace compte en un clic. Votre accès Pro reste actif jusqu\'à la fin de la période déjà facturée, puis bascule automatiquement sur le plan Free.',
+    },
+    {
+      id: 'faq-5',
+      question: 'Le widget est-il compatible avec tous les types de sites ?',
+      answer: 'Oui. Le widget est un simple snippet JavaScript universel — il fonctionne sur n\'importe quel site web, qu\'il soit construit avec WordPress, Webflow, un framework React ou Vue, ou même du HTML statique. L\'intégration prend moins de deux minutes.',
+    },
+    {
+      id: 'faq-6',
+      question: 'Mes données sont-elles sécurisées ?',
+      answer: 'Les données sont hébergées sur une infrastructure cloud certifiée (Railway / Supabase) avec chiffrement en transit (TLS) et au repos. L\'authentification utilise un système JWT avec refresh tokens. Nous ne revendons jamais vos données ni celles de vos clients à des tiers.',
+    },
+  ];
 
 
 }
