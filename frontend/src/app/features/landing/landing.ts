@@ -7,7 +7,7 @@ export interface FeatureCard {
   id: string;
   title: string;
   description: string;
-  icon: string;
+  image: string;
   color: string;
 }
 
@@ -17,6 +17,19 @@ export interface WorkflowCard {
   description: string;
   icon: string;
 }
+
+export interface PricingPlan {
+  id: string;
+  name: string;
+  price: number | null;
+  priceLabel?: string;
+  description: string;
+  cta: string;
+  ctaPath: string;
+  featured: boolean;
+  features: string[];
+}
+
 
 @Component({
   selector: 'app-landing',
@@ -41,14 +54,14 @@ export class Landing {
       id: 'ai-analysis',
       title: 'Analyse IA en temps réel',
       description: 'Chaque feedback est instantanément catégorisé et priorisé par l\'IA. Plus besoin de trier manuellement.',
-      icon: 'brain',
+      image: 'image/project_manager.png',
       color: '#EEF2FF',
     },
     {
       id: 'kanban',
       title: 'Kanban visuel',
       description: 'Visualisez l\'état de tous vos retours en un coup d\'œil. Déplacez les cartes de "À traiter" à "Résolu".',
-      icon: 'kanban',
+      image: 'image/collaboration.png',
       color: '#F0FDF4',
     },
   ];
@@ -58,21 +71,21 @@ export class Landing {
       id: 'widget',
       title: 'Widget intégrable',
       description: 'Un simple snippet JS à coller sur le site de votre client. Aucun compte requis pour soumettre un retour.',
-      icon: 'code',
+      image: 'image/track.png',
       color: '#FFF7ED',
     },
     {
       id: 'projects',
       title: 'Multi-projets',
       description: 'Gérez plusieurs clients et projets depuis un seul tableau de bord centralisé.',
-      icon: 'folder',
+      image: 'image/integration.png',
       color: '#F0F9FF',
     },
     {
       id: 'trends',
       title: 'Tendances & insights',
       description: 'Un graphique des 30 derniers jours pour détecter les pics de feedback et anticiper les problèmes.',
-      icon: 'chart',
+      image: 'image/trends.png',
       color: '#FDF4FF',
     },
   ];
@@ -119,6 +132,68 @@ export class Landing {
       icon: 'invoice',
     },
   ];
+
+  // -----------------------------------------------
+  // Pricing
+  // -----------------------------------------------
+  plans: PricingPlan[] = [
+    {
+      id: 'free',
+      name: 'Free',
+      price: 0,
+      description: 'Pour tester la valeur du produit sans engagement.',
+      cta: 'Commencer gratuitement',
+      ctaPath: '/register',
+      featured: false,
+      features: [
+        '1 projet actif',
+        '50 feedbacks / mois',
+        'Analyse IA (catégorie + résumé)',
+        'Tableau kanban',
+        'Widget intégrable',
+        'Support par email',
+      ],
+    },
+    {
+      id: 'pro',
+      name: 'Pro',
+      price: 9,
+      description: 'Pour les freelances et indépendants qui gèrent plusieurs clients.',
+      cta: 'Passer au Pro',
+      ctaPath: '/register?plan=pro',
+      featured: true,
+      features: [
+        '10 projets actifs',
+        'Feedbacks illimités',
+        'Analyse IA complète + score de priorité',
+        'Tableau kanban + filtres avancés',
+        'Widget intégrable personnalisable',
+        'Graphique de tendances 30 jours',
+        'Export CSV',
+        'Support prioritaire',
+      ],
+    },
+    {
+      id: 'team',
+      name: 'Team',
+      price: 29,
+      description: 'Pour les agences qui travaillent en équipe sur les mêmes projets.',
+      cta: 'Contacter l\'équipe',
+      ctaPath: '/contact',
+      featured: false,
+      features: [
+        'Projets illimités',
+        'Feedbacks illimités',
+        'Tout le plan Pro',
+        'Membres d\'équipe illimités',
+        'Gestion des rôles & permissions',
+        'Tableau de bord partagé',
+        'Intégrations (Slack, Notion…)',
+        'Support dédié + onboarding',
+      ],
+    },
+  ];
+
 
 
 
