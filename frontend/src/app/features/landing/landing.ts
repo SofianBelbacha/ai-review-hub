@@ -1,7 +1,26 @@
-import { Component, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, QueryList, signal, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Footer } from '../../shared/components/footer/footer';
+
+
+export interface ProblemCard {
+  id: string;
+  title: string;
+  body: string;
+  quote: string;
+  icon: string;
+  accent: 'red' | 'amber';
+}
+
+export interface SolutionStep {
+  id: string;
+  number: string;
+  title: string;
+  description: string;
+  icon: string;
+  details: string[];
+}
 
 export interface FeatureCard {
   id: string;
@@ -43,7 +62,7 @@ export interface FaqItem {
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
 })
-export class Landing {
+export class Landing implements AfterViewInit, OnDestroy {
 
   // --- Hero tabs ---
   activeTab = signal<string>('Project');
@@ -53,6 +72,123 @@ export class Landing {
   setActiveTab(tab: string): void {
     this.activeTab.set(tab);
   }
+
+  // -----------------------------------------------
+  // Problem section — animation au scroll
+  // -----------------------------------------------
+  @ViewChildren('problemCard') problemCardRefs!: QueryList<ElementRef>;
+  private observer?: IntersectionObserver;
+ 
+  problemCards: ProblemCard[] = [
+    {
+      id: 'p1',
+      title: 'Les retours arrivent de partout',
+      body: 'Email, Slack, Notion, appels Zoom, post-it… Aucun endroit unique. Vous cherchez, vous scrollez, vous oubliez.',
+      quote: '« J\'ai trouvé un bug critique dans un fil Slack de 3 semaines. »',
+      icon: 'chat',
+      accent: 'red',
+    },
+    {
+      id: 'p2',
+      title: 'Impossible de savoir quoi traiter en premier',
+      body: 'Bug bloquant ou demande cosmétique ? Sans priorisation claire, on commence par ce qui est facile, pas urgent.',
+      quote: '« On a corrigé la couleur d\'un bouton pendant qu\'un client ne pouvait pas payer. »',
+      icon: 'clock',
+      accent: 'amber',
+    },
+    {
+      id: 'p3',
+      title: 'Des retours qui se perdent sans réponse',
+      body: 'Le client a signalé un problème. Il attend. Personne ne l\'a vu. Il relance. Vous perdez sa confiance avant d\'avoir corrigé quoi que ce soit.',
+      quote: '« Mon client pensait qu\'on ignorait ses retours. »',
+      icon: 'alert',
+      accent: 'red',
+    },
+    {
+      id: 'p4',
+      title: 'Le tri prend des heures chaque semaine',
+      body: 'Lire, comprendre, reformuler, catégoriser, répondre. Pour chaque feedback. Multiplié par dix clients. C\'est un mi-temps que personne n\'a payé.',
+      quote: '« Je passe le lundi matin entier à trier des emails avant de coder. »',
+      icon: 'users',
+      accent: 'amber',
+    },
+    {
+      id: 'p5',
+      title: 'Aucune visibilité sur les tendances',
+      body: 'Le même problème revient chaque semaine, mais personne ne l\'a détecté parce que les retours sont éparpillés. Un graphique aurait suffi.',
+      quote: '« On a découvert le bug 3 mois après. 4 clients l\'avaient signalé. »',
+      icon: 'chart',
+      accent: 'red',
+    },
+    {
+      id: 'p6',
+      title: 'La phase de recettage est toujours chaotique',
+      body: 'À la livraison d\'un projet, les retours explosent. Sans système, c\'est le chaos. Chacun gère à sa façon, rien n\'est tracé.',
+      quote: '« La recette, c\'est le moment où tout part en vrille. »',
+      icon: 'grid',
+      accent: 'amber',
+    },
+  ];
+ 
+  ngAfterViewInit(): void {
+    this.observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            (entry.target as HTMLElement).classList.add('problem-card--visible');
+            this.observer?.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+ 
+    this.problemCardRefs.forEach(ref => this.observer?.observe(ref.nativeElement));
+  }
+ 
+  ngOnDestroy(): void {
+    this.observer?.disconnect();
+  }
+
+  // Dans la classe LandingComponent
+  solutionSteps: SolutionStep[] = [
+    {
+      id: 's1',
+      number: '01',
+      title: 'Collectez sans friction',
+      description: 'Vos clients soumettent leurs retours via un widget intégré ou un lien public. Aucun compte requis. Aucune friction.',
+      icon: 'widget',
+      details: [
+        'Widget JS en 2 lignes de code',
+        'Lien public partageable',
+        'Formulaire simple, sans inscription',
+      ],
+    },
+    {
+      id: 's2',
+      number: '02',
+      title: 'L\'IA trie et priorise',
+      description: 'Chaque retour est automatiquement catégorisé (bug, feature, question), résumé en une phrase et scoré selon le sentiment détecté.',
+      icon: 'ai',
+      details: [
+        'Catégorisation automatique',
+        'Résumé IA en une phrase',
+        'Score de priorité par sentiment',
+      ],
+    },
+    {
+      id: 's3',
+      number: '03',
+      title: 'Agissez sur ce qui compte',
+      description: 'Votre kanban affiche les retours priorisés. Vous traitez en premier ce qui bloque vraiment, pas ce qui est arrivé en dernier.',
+      icon: 'kanban',
+      details: [
+        'Kanban visuel par projet',
+        'Filtres par catégorie et priorité',
+        'Graphique de tendances 30 jours',
+      ],
+    },
+  ];
 
     // --- Features ---
   featuresRow1: FeatureCard[] = [

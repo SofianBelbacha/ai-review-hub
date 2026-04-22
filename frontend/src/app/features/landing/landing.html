@@ -80,6 +80,203 @@
     </div>
   </section>
 
+
+  <!-- =============================================
+      PROBLEM
+      ============================================= -->
+  <section class="problem">
+    <div class="container">
+ 
+      <div class="problem__header">
+        <span class="problem__label">
+          <span class="problem__label-dot" aria-hidden="true"></span>
+          Le problème
+        </span>
+        <h2 class="problem__title">
+          Vos retours clients arrivent de <em>partout</em>.<br>Rien n'est priorisé.
+        </h2>
+        <p class="problem__subtitle">
+          Emails, Slack, Notion, WhatsApp… Chaque feedback se perd dans un canal différent.
+          Résultat : votre équipe passe plus de temps à trier qu'à corriger.
+        </p>
+      </div>
+ 
+      <div class="problem__grid">
+        @for (card of problemCards; track card.id; let i = $index) {
+        <div class="problem-card"
+          [style.transition-delay]="(i * 80) + 'ms'"
+          #problemCard> 
+            <div class="problem-card__icon" [class.problem-card__icon--red]="card.accent === 'red'" [class.problem-card__icon--amber]="card.accent === 'amber'">
+              <ng-container [ngSwitch]="card.icon">
+ 
+                <ng-container *ngSwitchCase="'chat'">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                </ng-container>
+ 
+                <ng-container *ngSwitchCase="'clock'">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                </ng-container>
+ 
+                <ng-container *ngSwitchCase="'alert'">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                </ng-container>
+ 
+                <ng-container *ngSwitchCase="'users'">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                </ng-container>
+ 
+                <ng-container *ngSwitchCase="'chart'">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6"  y1="20" x2="6"  y2="14"/>
+                  </svg>
+                </ng-container>
+ 
+                <ng-container *ngSwitchCase="'grid'">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <path d="M3 9h18M9 21V9"/>
+                  </svg>
+                </ng-container>
+ 
+              </ng-container>
+            </div>
+ 
+            <h3 class="problem-card__title">{{ card.title }}</h3>
+            <p class="problem-card__body">{{ card.body }}</p>
+            <blockquote class="problem-card__quote">{{ card.quote }}</blockquote>
+ 
+          </div>
+        }
+      </div>
+ 
+      <!-- Bannière de conclusion -->
+      <div class="problem__cta-banner">
+        <p class="problem__cta-text">
+          <strong>Vous vous reconnaissez ?</strong>
+          AI Review Hub résout exactement ces problèmes — en moins de 5 minutes d'intégration.
+        </p>
+        <a routerLink="/register" class="problem__cta-link">
+          Essayer gratuitement
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 8h10M9 4l4 4-4 4"/>
+          </svg>
+        </a>
+      </div>
+ 
+    </div>
+  </section>
+
+  <!-- =============================================
+      SOLUTION
+      ============================================= -->
+  <section class="solution">
+    <div class="container">
+
+      <div class="solution__header">
+        <span class="solution__label">
+          <span class="solution__label-dot" aria-hidden="true"></span>
+          La solution
+        </span>
+        <h2 class="solution__title">
+          Un seul endroit.<br>Tout est clair, tout est priorisé.
+        </h2>
+        <p class="solution__subtitle">
+          AI Review Hub centralise chaque retour client, laisse l'IA faire le tri,
+          et vous présente exactement ce qu'il faut corriger en premier.
+        </p>
+      </div>
+
+      <div class="solution__steps">
+        @for (step of solutionSteps; track step.id; let last = $last) {
+
+          <div class="solution-step">
+
+            <!-- Numéro + connecteur -->
+            <div class="solution-step__aside">
+              <div class="solution-step__number">{{ step.number }}</div>
+              @if (!last) {
+                <div class="solution-step__connector" aria-hidden="true"></div>
+              }
+            </div>
+
+            <!-- Contenu -->
+            <div class="solution-step__body">
+
+              <div class="solution-step__card">
+
+                <!-- Icône -->
+                <div class="solution-step__icon">
+                  <ng-container [ngSwitch]="step.icon">
+
+                    <ng-container *ngSwitchCase="'widget'">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2"/>
+                        <path d="M8 21h8M12 17v4"/>
+                      </svg>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'ai'">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a4 4 0 0 1 4 4v1h1a3 3 0 0 1 0 6h-1v1a4 4 0 0 1-8 0v-1H7a3 3 0 0 1 0-6h1V6a4 4 0 0 1 4-4z"/>
+                        <path d="M9 12h6M12 9v6"/>
+                      </svg>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'kanban'">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="5" height="10" rx="1"/>
+                        <rect x="10" y="3" width="5" height="6" rx="1"/>
+                        <rect x="17" y="3" width="5" height="14" rx="1"/>
+                        <rect x="10" y="11" width="5" height="6" rx="1"/>
+                        <rect x="3" y="15" width="5" height="6" rx="1"/>
+                      </svg>
+                    </ng-container>
+
+                  </ng-container>
+                </div>
+
+                <div class="solution-step__content">
+                  <h3 class="solution-step__title">{{ step.title }}</h3>
+                  <p class="solution-step__description">{{ step.description }}</p>
+                  <ul class="solution-step__details">
+                    @for (detail of step.details; track detail) {
+                      <li class="solution-step__detail">
+                        <svg class="solution-step__check" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <polyline points="2.5 8 6 11.5 13.5 4"/>
+                        </svg>
+                        {{ detail }}
+                      </li>
+                    }
+                  </ul>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
+        }
+      </div>
+
+    </div>
+  </section>
+
   <!-- =============================================
       FEATURES
       ============================================= -->
