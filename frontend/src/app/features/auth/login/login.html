@@ -1,0 +1,189 @@
+<div class="auth-layout">
+
+  <!-- =============================================
+       PANNEAU GAUCHE — Branding
+       ============================================= -->
+  <aside class="auth-brand">
+
+    <!-- Logo -->
+    <a routerLink="/" class="auth-brand__logo" aria-label="AI Review Hub — accueil">
+      <svg class="auth-brand__logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"
+           fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M32 6c-9 0-16 7-16 16 0 5 2 9 5 12v6h22v-6c3-3 5-7 5-12 0-9-7-16-16-16z"/>
+        <path d="M24 40h16M26 46h12"/>
+        <circle cx="20" cy="28" r="2"/>
+        <circle cx="44" cy="28" r="2"/>
+        <circle cx="32" cy="22" r="2"/>
+        <line x1="22" y1="28" x2="30" y2="22"/>
+        <line x1="42" y1="28" x2="34" y2="22"/>
+      </svg>
+      <span class="auth-brand__logo-text">AI Review Hub</span>
+    </a>
+
+    <!-- Accroche centrale -->
+    <div class="auth-brand__body">
+      <blockquote class="auth-brand__quote">
+        Fini les retours clients perdus dans les emails. Tout est là, trié, priorisé.
+      </blockquote>
+      <div class="auth-brand__author">
+        <div class="auth-brand__avatar">JD</div>
+        <div>
+          <p class="auth-brand__author-name">Jean Dupont</p>
+          <p class="auth-brand__author-role">Directeur technique, Agence Pixel</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats en bas -->
+    <div class="auth-brand__stats">
+      <div class="auth-brand__stat">
+        <span class="auth-brand__stat-value">2 400+</span>
+        <span class="auth-brand__stat-label">Équipes actives</span>
+      </div>
+      <div class="auth-brand__stat-sep" aria-hidden="true"></div>
+      <div class="auth-brand__stat">
+        <span class="auth-brand__stat-value">98%</span>
+        <span class="auth-brand__stat-label">Satisfaction client</span>
+      </div>
+      <div class="auth-brand__stat-sep" aria-hidden="true"></div>
+      <div class="auth-brand__stat">
+        <span class="auth-brand__stat-value">‹ 3s</span>
+        <span class="auth-brand__stat-label">Analyse IA</span>
+      </div>
+    </div>
+
+  </aside>
+
+
+  <!-- =============================================
+       PANNEAU DROIT — Formulaire
+       ============================================= -->
+  <main class="auth-form-panel">
+    <div class="auth-form-wrap">
+
+      <!-- En-tête -->
+      <div class="auth-form__header">
+        <h1 class="auth-form__title">Bon retour.</h1>
+        <p class="auth-form__subtitle">Connectez-vous à votre espace.</p>
+      </div>
+
+      <!-- Formulaire -->
+      <form class="auth-form" (ngSubmit)="onSubmit()" novalidate>
+
+        <!-- Email -->
+        <div class="auth-field">
+          <label class="auth-field__label" for="email">Adresse email</label>
+          <div class="auth-field__input-wrap">
+            <svg class="auth-field__icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="4" width="16" height="12" rx="2"/>
+              <polyline points="2,4 10,11 18,4"/>
+            </svg>
+            <input
+              id="email"
+              class="auth-field__input"
+              type="email"
+              placeholder="vous@exemple.com"
+              autocomplete="email"
+              [ngModel]="email()"
+              (ngModelChange)="email.set($event)"
+              required>
+          </div>
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="auth-field">
+          <div class="auth-field__label-row">
+            <label class="auth-field__label" for="password">Mot de passe</label>
+            <a routerLink="/forgot-password" class="auth-field__forgot">Mot de passe oublié ?</a>
+          </div>
+          <div class="auth-field__input-wrap">
+            <svg class="auth-field__icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="4" y="8" width="12" height="10" rx="2"/>
+              <path d="M7 8V6a3 3 0 0 1 6 0v2"/>
+            </svg>
+            <input
+              id="password"
+              class="auth-field__input"
+              [type]="showPass() ? 'text' : 'password'"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              [ngModel]="password()"
+              (ngModelChange)="password.set($event)"
+              required>
+            <button
+              type="button"
+              class="auth-field__toggle"
+              (click)="togglePassword()"
+              [attr.aria-label]="showPass() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
+              @if (showPass()) {
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M1 10s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7z"/>
+                  <circle cx="10" cy="10" r="3"/>
+                  <line x1="2" y1="2" x2="18" y2="18"/>
+                </svg>
+              } @else {
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M1 10s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7z"/>
+                  <circle cx="10" cy="10" r="3"/>
+                </svg>
+              }
+            </button>
+          </div>
+        </div>
+
+        <!-- Erreur -->
+        @if (error()) {
+          <p class="auth-form__error" role="alert">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="8" cy="8" r="7"/>
+              <line x1="8" y1="5" x2="8" y2="8.5"/>
+              <circle cx="8" cy="11" r="0.5" fill="currentColor"/>
+            </svg>
+            {{ error() }}
+          </p>
+        }
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="auth-form__submit"
+          [disabled]="loading()"
+          [class.auth-form__submit--loading]="loading()">
+          @if (loading()) {
+            <span class="auth-form__spinner" aria-hidden="true"></span>
+            Connexion…
+          } @else {
+            Se connecter
+          }
+        </button>
+
+      </form>
+
+      <!-- Séparateur -->
+      <div class="auth-sep">
+        <span class="auth-sep__line" aria-hidden="true"></span>
+        <span class="auth-sep__label">ou</span>
+        <span class="auth-sep__line" aria-hidden="true"></span>
+      </div>
+
+      <!-- OAuth Google -->
+      <button type="button" class="auth-oauth">
+        <svg class="auth-oauth__icon" viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M19.6 10.23c0-.68-.06-1.36-.18-2H10v3.79h5.39a4.62 4.62 0 0 1-2 3.03v2.52h3.23c1.89-1.74 2.98-4.3 2.98-7.34z" fill="#4285F4"/>
+          <path d="M10 20c2.7 0 4.96-.9 6.62-2.43l-3.23-2.52c-.9.6-2.04.96-3.39.96-2.6 0-4.8-1.76-5.59-4.12H1.09v2.6A10 10 0 0 0 10 20z" fill="#34A853"/>
+          <path d="M4.41 11.89A6.02 6.02 0 0 1 4.1 10c0-.65.11-1.29.31-1.89V5.51H1.09A10 10 0 0 0 0 10c0 1.61.39 3.14 1.09 4.49l3.32-2.6z" fill="#FBBC05"/>
+          <path d="M10 3.96c1.47 0 2.79.51 3.83 1.5l2.87-2.87C14.96.99 12.7 0 10 0A10 10 0 0 0 1.09 5.51l3.32 2.6C5.2 5.72 7.4 3.96 10 3.96z" fill="#EA4335"/>
+        </svg>
+        Continuer avec Google
+      </button>
+
+      <!-- Lien inscription -->
+      <p class="auth-form__switch">
+        Pas encore de compte ?
+        <a routerLink="/register" class="auth-form__switch-link">Créer un compte</a>
+      </p>
+
+    </div>
+  </main>
+
+</div>
