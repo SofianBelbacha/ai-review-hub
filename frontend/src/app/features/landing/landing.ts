@@ -31,6 +31,15 @@ export interface FeatureCard {
   color: string;
 }
 
+export interface VideoFeature {
+  id: string;
+  title: string;
+  description: string;
+  videoSrc?: string;   
+  posterSrc?: string;  
+  accent: string;   
+}
+
 export interface WorkflowCard {
   id: string;
   title: string;
@@ -230,6 +239,33 @@ export class Landing implements AfterViewInit, OnDestroy {
       description: 'Un graphique des 30 derniers jours pour détecter les pics de feedback et anticiper les problèmes.',
       image: 'image/trends.png',
       color: '#FDF4FF',
+    },
+  ];
+
+  // -----------------------------------------------
+  // Video Features — section 3 colonnes avec média
+  // -----------------------------------------------
+  videoFeatures: VideoFeature[] = [
+    {
+      id: 'widget-embed',
+      title: 'Intégrez le widget en 2 minutes',
+      description: 'Copiez un snippet JS, collez-le sur le site de votre client. Vos retours arrivent instantanément.',
+      accent: '#EEF2FF',
+      videoSrc: 'https://bytescale.mobbin.com/FW25bBB/video/mobbin.com/prod/assets/file.mp4?enc=1.BQnbdJK6.NGEe6x9i9aOYzTwJ.DK1BKCNO6aQVJATLtV2MuCmrTRrmN6IeXY1MHD5g_TSXfti0oVE0Uxn-SsfdscCUw3P6wmNBksSzSPgNkJYwBlWgIft1ekFhexHCiQB-fTq_rigQuRQCxgKSha-LXmhDrXgTH8mxVkmI4wmRWIP8_R9s57g2zCOvho7ALvbdcv9bYFQBbgCa_J4vk6K40y-j_gJFJPdIiTNje05WZHaEj34Tkrhh1oiVmVhBtR2Yzx5Lgbx9TVd91tUKxT6oevSRYWaiTwnlLbUk77rdjnDqt9ojWbM2v7tIM3-a5G-JNpu-qWT_yjMurZovYbhnkBOSWQ',
+    },
+    {
+      id: 'ai-triage',
+      title: 'L\'IA trie à votre place',
+      description: 'Catégorie, résumé, score de priorité — chaque feedback est enrichi en moins de 3 secondes.',
+      accent: '#F0FDF4',
+      videoSrc: 'https://bytescale.mobbin.com/FW25bBB/video/mobbin.com/prod/assets/file.mp4?enc=1.BQnbdJK6.9kH0UglFp7TtiXRV.1UVODMWIhz8S5i1qazUyqCAqQKAfI_-KgUG0dQNbPscKw9lLySH3Gow1rhPyqmXnC80XXuPYEUQfS8BRcdgdDkDX5CKIcCkTO46i1gxtMk7PzKo6w_x7wUICj4axruWL0N0UFYVHlYVU0CdSK9Ks5eAEBqbACpZ2DtM5H8ifavKZSZ-zb6Slnvy7a33lYzWiGb71hzbyJQdIXmFKLznT-BymOXgqRGkTbSvN5slZlFS1ZoXMxKJMgmk6uu1UBODz-sE2OHDKc6oL4rBVhkk7yIz2m7_wyGsGmkMlDMmQfJMJyLrXoNjcQfpggcjAMGDjAKteXZ48GQ',
+    },
+    {
+      id: 'kanban-flow',
+      title: 'Du feedback au resolved',
+      description: 'Glissez les cartes de "À traiter" à "Résolu". Votre workflow, visualisé en temps réel.',
+      accent: '#FFF7ED',
+      videoSrc: 'https://bytescale.mobbin.com/FW25bBB/video/mobbin.com/prod/assets/file.mp4?enc=1.BQnbdJK6.fzCCFro2Ta7vlIT3.8j-Yv5SpGXhrOEjiHLg2es1HzA05kSarikmKP2VM7Hu4AlUdpwBVz5E3RzoP5F272sFHC5e_dEit9W7R6EAMre_8XTGFsZBkWBabNoKIqOpdwawNYB1rig9CAyyw7VZdhQLhRRyjd3CxljNVb67mUUCiRQk1NMuDM-bHL4JR46jkG6y8r-pSEjcNW2QleZn7f-nTy1qGYZpO0qF2P97js89b-3js2BdIZLd7jbJ0wRW0yn-gf_dZaxGFm6U2OtXcR3Q6zMXjOCgxxV4mCB1N70uTwLKE1WYfrFhtqzLyfs_LZcU08-ppMR_Lu7Q',
     },
   ];
 
