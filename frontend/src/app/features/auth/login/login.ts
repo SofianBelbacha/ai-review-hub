@@ -31,7 +31,6 @@ export class Login {
     this.loading.set(true);
  
     // emplacement pour le branchement du AuthService
-    // this.authService.login(this.email(), this.password()).subscribe(...)
     setTimeout(() => this.loading.set(false), 1500); // simulation
   }
 

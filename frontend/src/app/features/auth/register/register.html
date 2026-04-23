@@ -1,0 +1,315 @@
+<div class="auth-layout">
+
+  <!-- =============================================
+       PANNEAU GAUCHE — Branding
+       ============================================= -->
+  <aside class="auth-brand">
+
+    <a routerLink="/" class="auth-brand__logo" aria-label="AI Review Hub — accueil">
+      <svg class="auth-brand__logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"
+           fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M32 6c-9 0-16 7-16 16 0 5 2 9 5 12v6h22v-6c3-3 5-7 5-12 0-9-7-16-16-16z"/>
+        <path d="M24 40h16M26 46h12"/>
+        <circle cx="20" cy="28" r="2"/>
+        <circle cx="44" cy="28" r="2"/>
+        <circle cx="32" cy="22" r="2"/>
+        <line x1="22" y1="28" x2="30" y2="22"/>
+        <line x1="42" y1="28" x2="34" y2="22"/>
+      </svg>
+      <span class="auth-brand__logo-text">AI Review Hub</span>
+    </a>
+
+    <div class="auth-brand__body">
+
+      <!-- Checklist des avantages -->
+      <div class="auth-brand__perks">
+        <h2 class="auth-brand__perks-title">Tout ce dont vous avez besoin,<br>dès le premier jour.</h2>
+        <ul class="auth-brand__perks-list">
+          <li class="auth-brand__perk">
+            <span class="auth-brand__perk-icon" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="2.5 8 6 11.5 13.5 4"/></svg>
+            </span>
+            1 projet gratuit, sans carte bancaire
+          </li>
+          <li class="auth-brand__perk">
+            <span class="auth-brand__perk-icon" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="2.5 8 6 11.5 13.5 4"/></svg>
+            </span>
+            Analyse IA en moins de 3 secondes
+          </li>
+          <li class="auth-brand__perk">
+            <span class="auth-brand__perk-icon" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="2.5 8 6 11.5 13.5 4"/></svg>
+            </span>
+            Widget intégrable en 2 minutes
+          </li>
+          <li class="auth-brand__perk">
+            <span class="auth-brand__perk-icon" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="2.5 8 6 11.5 13.5 4"/></svg>
+            </span>
+            Tableau kanban prêt à l'emploi
+          </li>
+          <li class="auth-brand__perk">
+            <span class="auth-brand__perk-icon" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="2.5 8 6 11.5 13.5 4"/></svg>
+            </span>
+            Annulation à tout moment
+          </li>
+        </ul>
+      </div>
+
+      <!-- Avatars sociaux -->
+      <div class="auth-brand__social-proof">
+        <div class="auth-brand__avatars">
+          <div class="auth-brand__av" style="background: #6366f1;">ML</div>
+          <div class="auth-brand__av" style="background: #0ea5e9;">SC</div>
+          <div class="auth-brand__av" style="background: #10b981;">AR</div>
+          <div class="auth-brand__av" style="background: #f59e0b;">PD</div>
+          <div class="auth-brand__av auth-brand__av--more">+2k</div>
+        </div>
+        <p class="auth-brand__social-label">Rejoignez 2 400+ équipes qui font confiance à AI Review Hub</p>
+      </div>
+
+    </div>
+
+    <div class="auth-brand__stats">
+      <div class="auth-brand__stat">
+        <span class="auth-brand__stat-value">Gratuit</span>
+        <span class="auth-brand__stat-label">Pour démarrer</span>
+      </div>
+      <div class="auth-brand__stat-sep" aria-hidden="true"></div>
+      <div class="auth-brand__stat">
+        <span class="auth-brand__stat-value">50</span>
+        <span class="auth-brand__stat-label">Feedbacks offerts</span>
+      </div>
+      <div class="auth-brand__stat-sep" aria-hidden="true"></div>
+      <div class="auth-brand__stat">
+        <span class="auth-brand__stat-value">0€</span>
+        <span class="auth-brand__stat-label">Sans CB requise</span>
+      </div>
+    </div>
+
+  </aside>
+
+
+  <!-- =============================================
+       PANNEAU DROIT — Formulaire multi-étapes
+       ============================================= -->
+  <main class="auth-form-panel">
+    <div class="auth-form-wrap">
+
+      <!-- Indicateur d'étapes -->
+      <div class="auth-steps" aria-label="Étapes d'inscription">
+        <div class="auth-step" [class.auth-step--active]="step() === 1" [class.auth-step--done]="step() > 1">
+          <div class="auth-step__dot">
+            @if (step() > 1) {
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1.5 6 4.5 9 10.5 3"/></svg>
+            } @else {
+              <span>1</span>
+            }
+          </div>
+          <span class="auth-step__label">Votre identité</span>
+        </div>
+        <div class="auth-step__connector" [class.auth-step__connector--done]="step() > 1" aria-hidden="true"></div>
+        <div class="auth-step" [class.auth-step--active]="step() === 2">
+          <div class="auth-step__dot"><span>2</span></div>
+          <span class="auth-step__label">Vos accès</span>
+        </div>
+      </div>
+
+      <!-- ---- ÉTAPE 1 : Prénom + Nom ---- -->
+      @if (step() === 1) {
+        <div class="auth-form__header">
+          <h1 class="auth-form__title">Faisons connaissance.</h1>
+          <p class="auth-form__subtitle">Comment devons-nous vous appeler ?</p>
+        </div>
+
+        <div class="auth-form">
+
+          <div class="auth-fields-row">
+            <div class="auth-field">
+              <label class="auth-field__label" for="firstName">Prénom</label>
+              <div class="auth-field__input-wrap">
+                <input
+                  id="firstName"
+                  class="auth-field__input auth-field__input--no-icon"
+                  type="text"
+                  placeholder="Marie"
+                  autocomplete="given-name"
+                  [ngModel]="firstName()"
+                  (ngModelChange)="firstName.set($event)">
+              </div>
+            </div>
+
+            <div class="auth-field">
+              <label class="auth-field__label" for="lastName">Nom</label>
+              <div class="auth-field__input-wrap">
+                <input
+                  id="lastName"
+                  class="auth-field__input auth-field__input--no-icon"
+                  type="text"
+                  placeholder="Dupont"
+                  autocomplete="family-name"
+                  [ngModel]="lastName()"
+                  (ngModelChange)="lastName.set($event)">
+              </div>
+            </div>
+          </div>
+
+          @if (error()) {
+            <p class="auth-form__error" role="alert">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="7"/><line x1="8" y1="5" x2="8" y2="8.5"/><circle cx="8" cy="11" r="0.5" fill="currentColor"/></svg>
+              {{ error() }}
+            </p>
+          }
+
+          <button type="button" class="auth-form__submit" (click)="nextStep()">
+            Continuer
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="8" x2="13" y2="8"/><polyline points="9 4 13 8 9 12"/></svg>
+          </button>
+
+        </div>
+      }
+
+      <!-- ---- ÉTAPE 2 : Email + Mot de passe ---- -->
+      @if (step() === 2) {
+        <div class="auth-form__header">
+          <h1 class="auth-form__title">Bienvenue, {{ firstName() }}.</h1>
+          <p class="auth-form__subtitle">Créez vos identifiants de connexion.</p>
+        </div>
+
+        <form class="auth-form" (ngSubmit)="onSubmit()" novalidate>
+
+          <!-- Email -->
+          <div class="auth-field">
+            <label class="auth-field__label" for="email">Adresse email</label>
+            <div class="auth-field__input-wrap">
+              <svg class="auth-field__icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="4" width="16" height="12" rx="2"/>
+                <polyline points="2,4 10,11 18,4"/>
+              </svg>
+              <input
+                id="email"
+                class="auth-field__input"
+                type="email"
+                placeholder="marie@exemple.com"
+                autocomplete="email"
+                [ngModel]="email()"
+                (ngModelChange)="email.set($event)"
+                required>
+            </div>
+          </div>
+
+          <!-- Mot de passe -->
+          <div class="auth-field">
+            <label class="auth-field__label" for="password">Mot de passe</label>
+            <div class="auth-field__input-wrap">
+              <svg class="auth-field__icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="4" y="8" width="12" height="10" rx="2"/>
+                <path d="M7 8V6a3 3 0 0 1 6 0v2"/>
+              </svg>
+              <input
+                id="password"
+                class="auth-field__input"
+                [type]="showPass() ? 'text' : 'password'"
+                placeholder="••••••••"
+                autocomplete="new-password"
+                [ngModel]="password()"
+                (ngModelChange)="password.set($event)"
+                required>
+              <button type="button" class="auth-field__toggle" (click)="togglePassword()" [attr.aria-label]="showPass() ? 'Masquer' : 'Afficher'">
+                @if (showPass()) {
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M1 10s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7z"/><circle cx="10" cy="10" r="3"/>
+                    <line x1="2" y1="2" x2="18" y2="18"/>
+                  </svg>
+                } @else {
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M1 10s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7z"/><circle cx="10" cy="10" r="3"/>
+                  </svg>
+                }
+              </button>
+            </div>
+
+            <!-- Jauge de force du mot de passe -->
+            @if (password()) {
+              <div class="password-strength">
+                <div class="password-strength__bars">
+                  <div class="password-strength__bar" [class.password-strength__bar--active]="passwordStrength() >= 1" [class]="'password-strength__bar ' + (passwordStrength() >= 1 ? passwordStrengthClass() : '')"></div>
+                  <div class="password-strength__bar" [class.password-strength__bar--active]="passwordStrength() >= 2" [class]="'password-strength__bar ' + (passwordStrength() >= 2 ? passwordStrengthClass() : '')"></div>
+                  <div class="password-strength__bar" [class.password-strength__bar--active]="passwordStrength() >= 3" [class]="'password-strength__bar ' + (passwordStrength() >= 3 ? passwordStrengthClass() : '')"></div>
+                  <div class="password-strength__bar" [class.password-strength__bar--active]="passwordStrength() >= 4" [class]="'password-strength__bar ' + (passwordStrength() >= 4 ? passwordStrengthClass() : '')"></div>
+                </div>
+                <span class="password-strength__label" [class]="'password-strength__label--' + passwordStrengthClass()">
+                  {{ passwordStrengthLabel() }}
+                </span>
+              </div>
+            }
+          </div>
+
+          @if (error()) {
+            <p class="auth-form__error" role="alert">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="7"/><line x1="8" y1="5" x2="8" y2="8.5"/><circle cx="8" cy="11" r="0.5" fill="currentColor"/></svg>
+              {{ error() }}
+            </p>
+          }
+
+          <div class="auth-form__actions">
+            <button type="button" class="auth-form__back" (click)="prevStep()">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="13" y1="8" x2="3" y2="8"/><polyline points="7 12 3 8 7 4"/></svg>
+              Retour
+            </button>
+
+            <button
+              type="submit"
+              class="auth-form__submit"
+              [disabled]="loading()"
+              [class.auth-form__submit--loading]="loading()">
+              @if (loading()) {
+                <span class="auth-form__spinner" aria-hidden="true"></span>
+                Création…
+              } @else {
+                Créer mon compte
+              }
+            </button>
+          </div>
+
+          <p class="auth-form__legal">
+            En créant un compte, vous acceptez nos
+            <a routerLink="/terms" class="auth-form__legal-link">Conditions d'utilisation</a>
+            et notre
+            <a routerLink="/privacy" class="auth-form__legal-link">Politique de confidentialité</a>.
+          </p>
+
+        </form>
+      }
+
+      <!-- Séparateur + OAuth (étape 1 uniquement) -->
+      @if (step() === 1) {
+        <div class="auth-sep">
+          <span class="auth-sep__line" aria-hidden="true"></span>
+          <span class="auth-sep__label">ou</span>
+          <span class="auth-sep__line" aria-hidden="true"></span>
+        </div>
+
+        <button type="button" class="auth-oauth">
+          <svg class="auth-oauth__icon" viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M19.6 10.23c0-.68-.06-1.36-.18-2H10v3.79h5.39a4.62 4.62 0 0 1-2 3.03v2.52h3.23c1.89-1.74 2.98-4.3 2.98-7.34z" fill="#4285F4"/>
+            <path d="M10 20c2.7 0 4.96-.9 6.62-2.43l-3.23-2.52c-.9.6-2.04.96-3.39.96-2.6 0-4.8-1.76-5.59-4.12H1.09v2.6A10 10 0 0 0 10 20z" fill="#34A853"/>
+            <path d="M4.41 11.89A6.02 6.02 0 0 1 4.1 10c0-.65.11-1.29.31-1.89V5.51H1.09A10 10 0 0 0 0 10c0 1.61.39 3.14 1.09 4.49l3.32-2.6z" fill="#FBBC05"/>
+            <path d="M10 3.96c1.47 0 2.79.51 3.83 1.5l2.87-2.87C14.96.99 12.7 0 10 0A10 10 0 0 0 1.09 5.51l3.32 2.6C5.2 5.72 7.4 3.96 10 3.96z" fill="#EA4335"/>
+          </svg>
+          Continuer avec Google
+        </button>
+      }
+
+      <!-- Lien connexion -->
+      <p class="auth-form__switch">
+        Déjà un compte ?
+        <a routerLink="/login" class="auth-form__switch-link">Se connecter</a>
+      </p>
+
+    </div>
+  </main>
+
+</div>
