@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, QueryList, signal, Vie
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Footer } from '../../shared/components/footer/footer';
+import { Navbar } from '../../shared/components/navbar/navbar';
 
 
 export interface ProblemCard {
@@ -58,7 +59,7 @@ export interface FaqItem {
 
 @Component({
   selector: 'app-landing',
-  imports: [CommonModule, RouterLink, Footer],
+  imports: [CommonModule, RouterLink, Navbar, Footer],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
 })
@@ -150,7 +151,7 @@ export class Landing implements AfterViewInit, OnDestroy {
     this.observer?.disconnect();
   }
 
-  // Dans la classe LandingComponent
+  // Solution section 
   solutionSteps: SolutionStep[] = [
     {
       id: 's1',
