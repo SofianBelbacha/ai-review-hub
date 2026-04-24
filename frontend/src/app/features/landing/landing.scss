@@ -215,11 +215,13 @@
 
 
 // =============================================
-// PROBLEM
+// PROBLEM — Accordéon interactif Option C
 // =============================================
-
+ 
 .problem { padding: 96px 0; }
-
+ 
+// En-tête
+ 
 .problem__header {
   display: flex;
   flex-direction: column;
@@ -229,7 +231,7 @@
   margin: 0 auto 64px;
   text-align: center;
 }
-
+ 
 .problem__label {
   display: inline-flex;
   align-items: center;
@@ -238,121 +240,300 @@
   border-radius: var(--radius-pill);
   border: 0.5px solid var(--color-border);
   font-family: var(--font-medium);
-  font-size: 12px;
+  font-size: 11px;
   color: var(--color-muted);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-
+ 
 .problem__label-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: var(--color-dark);
+  background-color: #EF4444;
   flex-shrink: 0;
+  animation: pulse 2s ease-in-out infinite;
 }
-
+ 
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.8); }
+}
+ 
 .problem__title {
   font-family: var(--font-base);
   font-size: 48px;
   font-weight: 400;
   line-height: 1.15;
   color: var(--color-dark);
-
+ 
   em {
     font-style: normal;
-    color: var(--color-muted); // ← même que le reste, pas de rouge
+    position: relative;
+ 
+    // Soulignement ondulé sous le mot clé
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #EF4444, #F97316);
+      border-radius: 2px;
+    }
   }
 }
-
+ 
 .problem__subtitle {
   font-size: 18px;
   line-height: 1.55;
   color: var(--color-muted);
 }
-
-// Grille — même structure que .features__row--3
-.problem__grid {
+ 
+// ── Layout 40/60 ──────────────────────────────
+ 
+.problem__layout {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-// Carte — même token que .feature-card / .wf-card
-.problem-card {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 28px 24px 24px;
+  grid-template-columns: 2fr 3fr;
+  gap: 0;
   border-radius: var(--radius-card);
   border: 1px solid var(--color-border);
-  background-color: var(--color-white);
-
-  // Animation d'entrée — identique aux autres sections
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-
-  &--visible {
-    opacity: 1;
-    transform: none;
+  overflow: hidden;
+  margin-bottom: 16px;
+  min-height: 480px;
+}
+ 
+// ── Colonne gauche : liste accordéon ──────────
+ 
+.problem__list {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--color-border);
+}
+ 
+.problem__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease;
+  overflow: hidden;
+ 
+  &:last-child { border-bottom: none; }
+ 
+  &:hover:not(.problem__item--active) {
+    background-color: var(--color-surface-lt);
   }
-
-  &:hover {
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.07);
-    transform: translateY(-2px);
-  }
-
-  // Quand visible + hover : on cumule
-  &--visible:hover {
-    transform: translateY(-2px);
+ 
+  // État actif
+  &--active {
+    background-color: var(--color-white);
   }
 }
-
-// Icône — même token que .wf-card__icon
-.problem-card__icon {
+ 
+// Icône de l'item
+ 
+.problem__item-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   flex-shrink: 0;
-
-  svg { width: 20px; height: 20px; color: var(--color-dark); }
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+ 
+  svg { width: 16px; height: 16px; color: var(--color-dark); }
+ 
+  // Accent rouge
+  &--red {
+    background-color: #FEF2F2;
+    border-color: #FECACA;
+    svg { color: #EF4444; }
+  }
+ 
+  // Accent amber
+  &--amber {
+    background-color: #FFFBEB;
+    border-color: #FDE68A;
+    svg { color: #D97706; }
+  }
+ 
+  .problem__item--active & {
+    background-color: var(--color-dark);
+    border-color: var(--color-dark);
+    svg { color: var(--color-white); }
+  }
+ 
+  .problem__item--active.problem__item--red & {
+    background-color: #EF4444;
+    border-color: #EF4444;
+    svg { color: var(--color-white); }
+  }
+ 
+  .problem__item--active.problem__item--amber & {
+    background-color: #D97706;
+    border-color: #D97706;
+    svg { color: var(--color-white); }
+  }
 }
-
-.problem-card__title {
+ 
+// Titre de l'item
+ 
+.problem__item-title {
+  flex: 1;
   font-family: var(--font-medium);
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 500;
   line-height: 1.35;
+  color: var(--color-muted);
+  transition: color 0.15s ease;
+ 
+  .problem__item--active & { color: var(--color-dark); }
+}
+ 
+// Flèche
+ 
+.problem__item-arrow {
+  width: 14px;
+  height: 14px;
+  color: var(--color-border);
+  flex-shrink: 0;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
+ 
+  .problem__item--active &,
+  .problem__item:hover & {
+    opacity: 1;
+    transform: translateX(0);
+    color: var(--color-muted);
+  }
+ 
+  .problem__item--active & { color: var(--color-dark); }
+}
+ 
+// Barre de progression en bas de l'item actif
+ 
+.problem__item-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-dark), rgba(20,21,26,.3));
+  border-radius: 1px;
+  animation: barGrow 0s linear forwards; // pas d'auto-play, juste la présence
+ 
+  @keyframes barGrow {
+    from { width: 0; }
+    to   { width: 100%; }
+  }
+}
+ 
+// ── Colonne droite : panneau de détail ────────
+ 
+.problem__panel {
+  background-color: var(--color-surface-lt);
+  display: flex;
+  align-items: flex-start;
+  padding: 40px 40px;
+}
+ 
+.problem__panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  animation: panelFadeIn 0.25s ease;
+}
+ 
+@keyframes panelFadeIn {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+ 
+// Icône large dans le panneau
+ 
+.problem__panel-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  flex-shrink: 0;
+ 
+  svg { width: 26px; height: 26px; color: var(--color-dark); }
+ 
+  &--red {
+    background-color: #FEF2F2;
+    border-color: #FECACA;
+    svg { color: #EF4444; }
+  }
+ 
+  &--amber {
+    background-color: #FFFBEB;
+    border-color: #FDE68A;
+    svg { color: #D97706; }
+  }
+}
+ 
+.problem__panel-title {
+  font-family: var(--font-medium);
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.3;
   color: var(--color-dark);
 }
-
-.problem-card__body {
+ 
+.problem__panel-body {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--color-muted);
+}
+ 
+// Citation dans le panneau
+ 
+.problem__panel-quote {
+  display: flex;
+  gap: 14px;
+  padding: 20px;
+  background-color: var(--color-white);
+  border-radius: var(--radius-inner);
+  border: 1px solid var(--color-border);
+  margin: 0;
+}
+ 
+.problem__panel-quote-mark {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: var(--color-border);
+  margin-top: 2px;
+}
+ 
+.problem__panel-quote p,
+.problem__panel-quote {
   font-size: 14px;
+  font-style: italic;
   line-height: 1.65;
   color: var(--color-muted);
 }
-
-// Citation — même que .faq-item__answer : fond surface, pas de couleur
-.problem-card__quote {
-  margin-top: 4px;
-  padding: 10px 14px;
-  background-color: var(--color-surface-lt);
-  border-radius: var(--radius-inner);
-  border: 0.5px solid var(--color-border);
-  font-size: 13px;
-  font-style: italic;
-  line-height: 1.5;
-  color: var(--color-muted);
-}
-
-// Bannière de conclusion — même que .faq__aside / .workflow__hero-card
+ 
+// ── Bannière de conclusion ────────────────────
+ 
 .problem__cta-banner {
   display: flex;
   align-items: center;
@@ -363,15 +544,14 @@
   border-radius: var(--radius-card);
   border: 1px solid var(--color-border);
 }
-
+ 
 .problem__cta-text {
   font-size: 14px;
   line-height: 1.6;
   color: var(--color-muted);
-
   strong { color: var(--color-dark); font-weight: 500; }
 }
-
+ 
 .problem__cta-link {
   display: inline-flex;
   align-items: center;
@@ -385,9 +565,7 @@
   font-size: 14px;
   text-decoration: none;
   transition: opacity 0.15s ease, gap 0.15s ease;
-
   svg { width: 14px; height: 14px; }
-
   &:hover { opacity: 0.85; gap: 10px; }
 }
 
@@ -932,155 +1110,6 @@
   }
 }
 
-
-// =============================================
-// WORKFLOW — grande carte + mini-cartes
-// =============================================
- 
-.workflow { 
-  align-items: center;
-  background-color: rgb(247, 247, 248);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  
-}
- 
-// Grande carte centrale
-
-.workflow__hero-card {
-    align-content: center;
-    align-items: center;
-    display: flex;
-    flex: none;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    gap: 64px;
-    height: min-content;
-    justify-content: center;
-    overflow: hidden;
-    padding: 120px 0 0;
-}
- 
-.workflow__hero-title {
-  font-family: var(--font-base);
-  font-size: 48px;
-  font-weight: 400;
-  line-height: 1.2;
-  color: var(--color-dark);
-  max-width: 680px;
-  text-align: center;
-}
- 
-.workflow__hero-image {
-  position: relative;
-  width: 100%;
-  max-width: 750px;
-}
-
-.workflow__hero-image-bg {
-    background-color: rgb(239, 239, 240);
-    border-radius: 12px;
-    flex: none;
-    height: 310px;
-    left: calc(50.00000000000002% - 648px / 2);
-    overflow: hidden;
-    position: absolute;
-    top: -18px;
-    width: 648px;
-    will-change: var(--framer-will-change-override, transform);
-}
- 
-.workflow__hero-image-frame {
-  position: relative;
-  z-index: 1;
-  border-radius: var(--radius-card);
-  border: 1px solid var(--color-border);
-  overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
- 
-  img {
-    display: block;
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-  }
-}
- 
-.workflow__hero-quote {
-  font-size: 32px;
-  line-height: 1.6;
-  max-width: 800px;
-  text-align: center;
-}
- 
-// Grille de mini-cartes  
- 
-.workflow__grid { width: 100%; padding: 100px 0 120px 0; }
- 
-.workflow__grid-col {
-  display: flex;
-  flex-direction: column;
-  border-radius: var(--radius-card);
-  border: 1px solid var(--color-border);
-  overflow: hidden;
-  width: 1136px;
-  margin: auto;
-}
- 
-.workflow__row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-
- 
-  // Séparateur horizontal entre les 2 rangées
-  & + & {
-    border-top: 1px solid var(--color-border);
-  }
-}
-  
-// Mini-carte
- 
-.wf-card {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 64px 32px 32px;
-  transition: background 0.15s ease;
-  height: 240px;
-  position: relative;
-  width: 378px;
-
-
-  // Séparateurs verticaux entre cartes de la même rangée
-  & + & { border-left: 1px solid var(--color-border); }
- 
-  &:hover { background-color: var(--color-surface-lt); }
-}
- 
-.wf-card__icon svg { width: 40px; height: 40px; color: var(--color-dark); }
-
- 
-.wf-card__content {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
- 
-.wf-card__title {
-  font-family: var(--font-base);
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 1.3;
-  color: var(--color-dark);
-}
- 
-.wf-card__text {
-  font-size: 16px;
-  line-height: 1.55;
-  color: var(--color-muted);
-}
-
 // =============================================
 // PRICING
 // =============================================
@@ -1562,7 +1591,6 @@
   .problem__title { font-size: 40px; }
   .problem__grid  { grid-template-columns: 1fr 1fr; }
   .features__title      { font-size: 40px; }
-  .workflow__hero-title { font-size: 32px; }
   .pricing__title       { font-size: 40px; }
   .faq__title           { font-size: 32px; }
   .faq__layout          { grid-template-columns: 240px 1fr; gap: 40px; }
@@ -1583,12 +1611,14 @@
   .preview__tabs        { display: none; }
   .trust__logo          { height: 22px; width: auto; }
 
-  .problem              { padding: 64px 0; }
-  .problem__title       { font-size: 32px; }
-  .problem__subtitle    { font-size: 16px; }
-  .problem__header      { margin-bottom: 40px; }
-  .problem__grid        { grid-template-columns: 1fr; }
-  .problem__cta-banner  { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .problem             { padding: 64px 0; }
+  .problem__header     { margin-bottom: 40px; }
+  .problem__title      { font-size: 32px; }
+  .problem__subtitle   { font-size: 16px; }
+  .problem__layout     { grid-template-columns: 1fr; min-height: auto; }
+  .problem__list       { border-right: none; border-bottom: 1px solid var(--color-border); }
+  .problem__panel      { padding: 28px 24px; }
+  .problem__cta-banner { flex-direction: column; align-items: flex-start; gap: 16px; }
 
  
   .features             { padding: 64px 0; }
@@ -1604,14 +1634,6 @@
   .vf__item--even .vf__caption { order: unset; }
   .vf__caption         { text-align: center; }
   .vf__caption-desc    { margin-inline: auto; }
-
- 
-  .workflow             { padding: 64px 0; }
-  .workflow__hero-card  { padding: 32px 24px; gap: 28px; }
-  .workflow__hero-title { font-size: 26px; }
-  .workflow__hero-quote { font-size: 15px; }
-  .workflow__row        { grid-template-columns: 1fr; }
-  .wf-card + .wf-card   { border-left: none; border-top: 1px solid var(--color-border); }
  
   .pricing              { padding: 64px 0; }
   .pricing__header      { margin-bottom: 40px; }
