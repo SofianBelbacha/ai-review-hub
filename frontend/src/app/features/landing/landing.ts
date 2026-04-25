@@ -23,21 +23,30 @@ export interface SolutionStep {
   details: string[];
 }
 
-export interface FeatureCard {
+export interface FeatureTab {
   id: string;
+  icon: string;
+  label: string;
   title: string;
   description: string;
-  image: string;
-  color: string;
+  details: string[];
+  accentColor: string;
+  mockType: 'feedback-list' | 'kanban' | 'widget' | 'trends';
+}
+
+export interface CompareRow {
+  topic: string;
+  before: string;
+  after: string;
 }
 
 export interface VideoFeature {
   id: string;
   title: string;
   description: string;
-  videoSrc?: string;   
-  posterSrc?: string;  
-  accent: string;   
+  videoSrc?: string;
+  posterSrc?: string;
+  accent: string;
 }
 
 export interface PricingPlan {
@@ -69,16 +78,16 @@ export class Landing {
 
   // --- Hero tabs ---
   activeTab = signal<string>('Project');
- 
+
   tabs = ['Project', 'Task', 'Message', 'Invoice', 'Clients', 'Timer'];
- 
+
   setActiveTab(tab: string): void {
     this.activeTab.set(tab);
   }
 
-    // ── Problem — Accordéon ───────────────────────────────
+  // ── Problem — Accordéon ───────────────────────────────
   activeProblем = signal<string>('scattered');
- 
+
   problemItems: ProblemItem[] = [
     {
       id: 'scattered',
@@ -129,11 +138,11 @@ export class Landing {
       accent: 'neutral',
     },
   ];
- 
+
   activeProblem = computed(() =>
     this.problemItems.find(p => p.id === this.activeProblем()) ?? this.problemItems[0]
   );
- 
+
   setActiveProblem(id: string): void {
     this.activeProblем.set(id);
   }
@@ -141,83 +150,87 @@ export class Landing {
   // Solution section 
   solutionSteps: SolutionStep[] = [
     {
-      id: 's1',
-      number: '01',
+      id: 'collect', number: '01', icon: 'widget',
       title: 'Collectez sans friction',
-      description: 'Vos clients soumettent leurs retours via un widget intégré ou un lien public. Aucun compte requis. Aucune friction.',
-      icon: 'widget',
-      details: [
-        'Widget JS en 2 lignes de code',
-        'Lien public partageable',
-        'Formulaire simple, sans inscription',
-      ],
+      description: 'Un widget JS à coller une fois sur le site de votre client. Vos retours arrivent directement dans votre tableau de bord, sans compte requis pour le client.',
+      details: ['Intégration en moins de 2 minutes', 'Formulaire personnalisable', 'Aucune connexion requise pour le client'],
     },
     {
-      id: 's2',
-      number: '02',
-      title: 'L\'IA trie et priorise',
-      description: 'Chaque retour est automatiquement catégorisé (bug, feature, question), résumé en une phrase et scoré selon le sentiment détecté.',
-      icon: 'ai',
-      details: [
-        'Catégorisation automatique',
-        'Résumé IA en une phrase',
-        'Score de priorité par sentiment',
-      ],
+      id: 'analyze', number: '02', icon: 'ai',
+      title: 'L\'IA analyse et priorise',
+      description: 'Chaque retour est automatiquement catégorisé (bug, feature, question), résumé en une phrase et scoré selon l\'urgence détectée dans le message.',
+      details: ['Catégorisation automatique', 'Résumé IA en une phrase', 'Score de priorité basé sur le sentiment'],
     },
     {
-      id: 's3',
-      number: '03',
-      title: 'Agissez sur ce qui compte',
-      description: 'Votre kanban affiche les retours priorisés. Vous traitez en premier ce qui bloque vraiment, pas ce qui est arrivé en dernier.',
-      icon: 'kanban',
-      details: [
-        'Kanban visuel par projet',
-        'Filtres par catégorie et priorité',
-        'Graphique de tendances 30 jours',
-      ],
+      id: 'resolve', number: '03', icon: 'kanban',
+      title: 'Traitez et résolvez',
+      description: 'Votre équipe voit immédiatement quoi traiter en premier. Déplacez les cartes du kanban au fil de l\'avancement, filtrez par projet ou par catégorie.',
+      details: ['Kanban À traiter → En cours → Résolu', 'Filtres par projet et catégorie', 'Graphique de tendances 30 jours'],
     },
   ];
+  // --- Features ---
+  // Section E — Feature tabs
+  activeFeatureTab = signal<string>('ai');
 
-    // --- Features ---
-  featuresRow1: FeatureCard[] = [
+  featureTabs: FeatureTab[] = [
     {
-      id: 'ai-analysis',
-      title: 'Analyse IA en temps réel',
-      description: 'Chaque feedback est instantanément catégorisé et priorisé par l\'IA. Plus besoin de trier manuellement.',
-      image: 'image/project_manager.png',
-      color: '#EEF2FF',
+      id: 'ai',
+      icon: 'brain',
+      label: 'Analyse IA',
+      title: 'L\'IA analyse chaque retour en moins de 3 secondes',
+      description: 'Catégorie, résumé, score de priorité — tout est calculé automatiquement dès qu\'un feedback arrive. Votre équipe ne voit que l\'essentiel.',
+      details: ['Catégorie : bug, feature ou question', 'Résumé en une phrase claire', 'Score de priorité basé sur le sentiment'],
+      accentColor: '#EEF2FF',
+      mockType: 'feedback-list',
     },
     {
       id: 'kanban',
-      title: 'Kanban visuel',
-      description: 'Visualisez l\'état de tous vos retours en un coup d\'œil. Déplacez les cartes de "À traiter" à "Résolu".',
-      image: 'image/collaboration.png',
-      color: '#F0FDF4',
+      icon: 'kanban',
+      label: 'Kanban',
+      title: 'Votre workflow client en un coup d\'œil',
+      description: 'Trois colonnes, zéro confusion. Déplacez les cartes de "À traiter" à "Résolu" au fil de votre avancement. Filtrez par projet, catégorie ou priorité.',
+      details: ['Colonnes : À traiter · En cours · Résolu', 'Filtres par projet et catégorie', 'Déplacement par glisser-déposer'],
+      accentColor: '#F0FDF4',
+      mockType: 'kanban',
     },
-  ];
- 
-  featuresRow2: FeatureCard[] = [
     {
       id: 'widget',
-      title: 'Widget intégrable',
-      description: 'Un simple snippet JS à coller sur le site de votre client. Aucun compte requis pour soumettre un retour.',
-      image: 'image/track.png',
-      color: '#FFF7ED',
-    },
-    {
-      id: 'projects',
-      title: 'Multi-projets',
-      description: 'Gérez plusieurs clients et projets depuis un seul tableau de bord centralisé.',
-      image: 'image/integration.png',
-      color: '#F0F9FF',
+      icon: 'code',
+      label: 'Widget',
+      title: 'Vos clients soumettent sans créer de compte',
+      description: 'Un snippet JS à coller une seule fois sur le site. Vos clients voient un formulaire propre, sans friction. Leurs retours arrivent directement dans votre tableau de bord.',
+      details: ['Intégration en moins de 2 minutes', 'Formulaire personnalisable aux couleurs du projet', 'Aucun compte requis pour le client final'],
+      accentColor: '#FFF7ED',
+      mockType: 'widget',
     },
     {
       id: 'trends',
-      title: 'Tendances & insights',
-      description: 'Un graphique des 30 derniers jours pour détecter les pics de feedback et anticiper les problèmes.',
-      image: 'image/trends.png',
-      color: '#FDF4FF',
+      icon: 'chart',
+      label: 'Tendances',
+      title: 'Détectez les pics avant qu\'ils deviennent des crises',
+      description: 'Un graphique des 30 derniers jours vous montre l\'évolution du volume de feedbacks par projet. Idéal pour repérer une livraison qui génère trop de retours.',
+      details: ['Graphique sur 30 jours glissants', 'Volume par projet et par catégorie', 'Alerte si volume anormal détecté'],
+      accentColor: '#FDF4FF',
+      mockType: 'trends',
     },
+  ];
+
+  setActiveFeatureTab(id: string): void {
+    this.activeFeatureTab.set(id);
+  }
+
+  activeFeatureTabData = computed(() =>
+    this.featureTabs.find(t => t.id === this.activeFeatureTab()) ?? this.featureTabs[0]
+  );
+
+  // Section D — Tableau comparatif
+  compareRows: CompareRow[] = [
+    { topic: 'Collecte des retours', before: 'Email, Slack, WhatsApp, Notion… dispersés', after: 'Un seul formulaire, tout centralisé' },
+    { topic: 'Catégorisation', before: 'Manuelle, chronophage, souvent oubliée', after: 'Automatique par l\'IA en < 3 secondes' },
+    { topic: 'Priorisation', before: 'Aucune — on traite ce qui arrive en premier', after: 'Score calculé selon le sentiment détecté' },
+    { topic: 'Résumé du retour', before: 'À lire en entier, souvent flou', after: 'Une phrase claire générée par l\'IA' },
+    { topic: 'Suivi de l\'avancement', before: 'Fichier partagé ou Post-it', after: 'Kanban visuel en temps réel' },
+    { topic: 'Détection des anomalies', before: 'Jamais — sauf quand c\'est trop tard', after: 'Graphique 30 jours + alertes de volume' },
   ];
 
   // -----------------------------------------------
@@ -314,11 +327,11 @@ export class Landing {
   // FAQ — état d'ouverture géré avec un signal
   // -----------------------------------------------
   openFaqId = signal<string | null>(null);
- 
+
   toggleFaq(id: string): void {
     this.openFaqId.update(current => current === id ? null : id);
   }
- 
+
   faqs: FaqItem[] = [
     {
       id: 'faq-1',
