@@ -12,9 +12,11 @@ namespace AiReviewHub.Domain.Entities
     {
         public Guid Id { get; private set; }
         public Email Email { get; private set; } = null!;
-        public PasswordHash PasswordHash { get; private set; } = null!;
+        public PasswordHash? PasswordHash { get; private set; }
         public string FirstName { get; private set; } = string.Empty;
         public string LastName { get; private set; } = string.Empty;
+        public string? GoogleId { get; private set; }
+        public bool IsOAuthUser => PasswordHash is null;
         public Plan Plan { get; private set; }
         public DateTime CreatedAt { get; private set; }
         public DateTime? UpdatedAt { get; private set; }
@@ -43,6 +45,46 @@ namespace AiReviewHub.Domain.Entities
                 Plan = Plan.Free,
                 CreatedAt = now
             };
+        }
+
+        // Factory OAuth Google
+        public static User CreateWithGoogle(
+            string email,
+            string firstName,
+            string lastName,
+            string googleId,
+            DateTime now)
+        {
+            if (string.IsNullOrWhiteSpace(firstName))
+                throw new ArgumentException("First name cannot be empty");
+
+            if (string.IsNullOrWhiteSpace(lastName))
+                throw new ArgumentException("Last name cannot be empty");
+
+            if (string.IsNullOrWhiteSpace(googleId))
+                throw new ArgumentException("Google ID cannot be empty");
+
+            return new User
+            {
+                Id = Guid.NewGuid(),
+                Email = Email.Create(email),
+                PasswordHash = null, // pas de mot de passe pour OAuth
+                FirstName = firstName.Trim(),
+                LastName = lastName.Trim(),
+                GoogleId = googleId,
+                Plan = Plan.Free,
+                CreatedAt = now
+            };
+        }
+
+        // Lie un compte Google à un compte existant
+        public void LinkGoogleAccount(string googleId, DateTime now)
+        {
+            if (!string.IsNullOrWhiteSpace(GoogleId))
+                return; // déjà lié — pas d'erreur, idempotent
+
+            GoogleId = googleId;
+            UpdatedAt = now;
         }
 
         public void UpdatePlan(Plan plan, IDateTimeProvider dateTimeProvider)

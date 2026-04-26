@@ -32,7 +32,11 @@ namespace AiReviewHub.Application.Users.Commands.LoginUser
                 .FirstOrDefaultAsync(u => u.Email.Value == request.Email, cancellationToken)
                 ?? throw new UnauthorizedAccessException("Invalid credentials");
 
-            var isValid = _passwordHasher.Verify(request.Password, user.PasswordHash.Value);
+            if (user.IsOAuthUser)
+                throw new UnauthorizedAccessException(
+                    "This account uses Google Sign-In. Please use Google to login.");
+
+            var isValid = _passwordHasher.Verify(request.Password, user.PasswordHash!.Value);
 
             if (!isValid)
                 throw new UnauthorizedAccessException("Invalid credentials");

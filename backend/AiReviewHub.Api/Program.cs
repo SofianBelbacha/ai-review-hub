@@ -3,6 +3,7 @@ using AiReviewHub.Api.Middleware;
 using AiReviewHub.Infrastructure.Jobs;
 using AiReviewHub.Infrastructure.Persistence;
 using Hangfire;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -21,7 +22,12 @@ builder.Services.AddHealthChecks();
 
 builder.Services.AddAppDI(builder.Configuration);
 
-builder.Services.AddAuthentication("Bearer")
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
     .AddJwtBearer("Bearer", options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -37,7 +43,16 @@ builder.Services.AddAuthentication("Bearer")
             ),
             ClockSkew = TimeSpan.Zero
         };
+    })
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Google:ClientId"]!;
+        options.ClientSecret = builder.Configuration["Google:ClientSecret"]!;
+        options.CallbackPath = "/api/auth/google/callback";
+        options.Scope.Add("email");
+        options.Scope.Add("profile");
     });
+
 
 builder.Services.AddAuthorization();
 

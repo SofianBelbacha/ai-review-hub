@@ -24,12 +24,14 @@ namespace AiReviewHub.Infrastructure.Persistence.Configurations
             builder.HasIndex(u => u.Email)
                 .IsUnique();
 
+            // PasswordHash devient nullable
             builder.Property(u => u.PasswordHash)
                 .HasConversion(
-                    v => v.Value,
-                    v => PasswordHash.Create(v))
+                    v => v == null ? null : v.Value,
+                    v => v == null ? null : PasswordHash.Create(v))
                 .HasMaxLength(60)
-                .IsRequired();
+                .IsRequired(false); // ← nullable
+
 
             builder.Property(u => u.FirstName)
                 .HasMaxLength(100)
@@ -38,6 +40,14 @@ namespace AiReviewHub.Infrastructure.Persistence.Configurations
             builder.Property(u => u.LastName)
                 .HasMaxLength(100)
                 .IsRequired();
+
+            // UserConfiguration.cs
+            builder.Property(u => u.GoogleId)
+                .HasMaxLength(100);
+
+            builder.HasIndex(u => u.GoogleId)
+                .IsUnique()
+                .HasFilter("\"GoogleId\" IS NOT NULL"); // index partiel PostgreSQL — null exclus
 
             builder.Property(u => u.Plan)
                 .HasConversion<string>()
