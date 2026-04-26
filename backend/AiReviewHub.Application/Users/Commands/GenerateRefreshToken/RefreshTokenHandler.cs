@@ -71,7 +71,7 @@ namespace AiReviewHub.Application.Users.Commands.GenerateRefreshToken
             }
 
             // Attache le nouveau token
-            user.RefreshTokens.Add(tokens.RefreshToken);
+            user.AddRefreshToken(tokens.RefreshToken);
 
             // Nettoie les tokens inactifs
             var toRemove = user.RefreshTokens
@@ -79,7 +79,7 @@ namespace AiReviewHub.Application.Users.Commands.GenerateRefreshToken
                 .ToList();
 
             foreach (var old in toRemove)
-                user.RefreshTokens.Remove(old);
+                user.CleanupRefreshTokens(_dateTimeProvider.UtcNow);
 
             await _context.SaveChangesAsync(cancellationToken);
 

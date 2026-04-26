@@ -69,65 +69,26 @@ namespace AiReviewHub.Api.Controllers
             return NoContent();
         }
 
-        [HttpGet("google")]
+        [HttpPost("google")]
         [AllowAnonymous]
-        public IActionResult GoogleLogin([FromQuery] string? returnUrl = null)
+        public async Task<IActionResult> GoogleLogin(
+            [FromBody] GoogleLoginRequest request,
+            CancellationToken cancellationToken)
         {
-            var properties = new AuthenticationProperties
-            {
-                RedirectUri = Url.Action(nameof(GoogleCallback),
-                    new { returnUrl }),
-                Items = { { "returnUrl", returnUrl ?? "/" } }
-            };
-
-            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
-        }
-
-        [HttpGet("google/callback")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GoogleCallback(
-            [FromQuery] string? returnUrl = null,
-            CancellationToken cancellationToken = default)
-        {
-            // Récupère les infos Google depuis le cookie temporaire
-            var authenticateResult = await HttpContext
-                .AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
-
-            if (!authenticateResult.Succeeded)
-                return Unauthorized("Google authentication failed");
-
-            var claims = authenticateResult.Principal?.Claims;
-
-            var email = claims?
-                .FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            var firstName = claims?
-                .FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value;
-            var lastName = claims?
-                .FirstOrDefault(c => c.Type == ClaimTypes.Surname)?.Value;
-            var googleId = claims?
-                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            if (email is null || googleId is null)
-                return Unauthorized("Missing required Google claims");
-
             var result = await _mediator.Send(
-                new GoogleLoginCommand(
-                    email,
-                    firstName ?? string.Empty,
-                    lastName ?? string.Empty,
-                    googleId),
+                new GoogleLoginCommand(request.IdToken),
                 cancellationToken);
 
-            // Retourne les tokens JWT — le frontend les stocke
             return Ok(result);
         }
+
     }
 
     public record RegisterRequest(string Email, string Password, string FirstName, string LastName);
-
     public record LoginRequest(string Email, string Password);
     public record RefreshTokenRequest(string Token);
     public record RevokeTokenRequest(string Token, bool RevokeAll = false);
+    public record GoogleLoginRequest(string IdToken);
 
 
 }

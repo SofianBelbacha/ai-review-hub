@@ -16,26 +16,28 @@ namespace AiReviewHub.Application.Users.Commands.RegisterUser
         private readonly IAppDbContext _context;
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly ITokenService _tokenService;
         private readonly IJwtTokenGenerator _jwt;
         private readonly IMapper _mapper;
 
         public RegisterUserHandler(IAppDbContext context,
             IDateTimeProvider dateTimeProvider,
             IPasswordHasher passwordHasher,
-            IMapper mapper, IJwtTokenGenerator jwt)
+            IMapper mapper,  IJwtTokenGenerator jwt, ITokenService tokenService)
         {
             _context = context;
             _dateTimeProvider = dateTimeProvider;
             _passwordHasher = passwordHasher;
             _mapper = mapper;
             _jwt = jwt;
+            _tokenService = tokenService;
         }
 
         public async Task<RegisterUserResult> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
             // Vérifie que l'email n'est pas déjà utilisé
             var emailExists = await _context.Users
-                .AnyAsync(u => u.Email.Value == request.Email,
+                .AnyAsync(u => u.Email.Value == request.Email.ToLowerInvariant(),
                     cancellationToken);
 
             if (emailExists)
@@ -53,22 +55,21 @@ namespace AiReviewHub.Application.Users.Commands.RegisterUser
                 _dateTimeProvider.UtcNow
             );
 
-            // Génère les deux tokens
-            var tokens = _jwt.GenerateTokens(user.Id, user.Email.Value);
-
-            // On attache l'objet RefreshToken directement
-            user.RefreshTokens.Add(tokens.RefreshToken);
-
 
             _context.Users.Add(user);
+
+            // Délègue la création de session à ITokenService
+            var session = await _tokenService.CreateSessionAsync(user, _dateTimeProvider.UtcNow, cancellationToken);
+
             await _context.SaveChangesAsync(cancellationToken);
 
             var result = _mapper.Map<RegisterUserResult>(user);
             return result with
             {
-                AccessToken = tokens.AccessToken,
-                RefreshToken = tokens.RawRefreshToken,
+                AccessToken = session.AccessToken,
+                RefreshToken = session.RawRefreshToken
             };
+
         }
     }
 }

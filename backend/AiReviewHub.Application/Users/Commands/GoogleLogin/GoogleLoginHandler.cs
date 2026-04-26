@@ -12,41 +12,49 @@ namespace AiReviewHub.Application.Users.Commands.GoogleLogin
     public class GoogleLoginHandler : IRequestHandler<GoogleLoginCommand, GoogleLoginResult>
     {
         private readonly IAppDbContext _context;
-        private readonly IJwtTokenGenerator _jwt;
+        private readonly ITokenService _tokenService;
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IGoogleTokenValidator _googleValidator;
+
 
         public GoogleLoginHandler(
             IAppDbContext context,
-            IJwtTokenGenerator jwt,
-            IDateTimeProvider dateTimeProvider)
+            IDateTimeProvider dateTimeProvider,
+            ITokenService tokenService,
+            IGoogleTokenValidator googleValidator)
         {
             _context = context;
-            _jwt = jwt;
             _dateTimeProvider = dateTimeProvider;
+            _tokenService = tokenService;
+            _googleValidator = googleValidator;
         }
 
-        public async Task<GoogleLoginResult> Handle(
-            GoogleLoginCommand request,
-            CancellationToken cancellationToken)
+        public async Task<GoogleLoginResult> Handle(GoogleLoginCommand request, CancellationToken cancellationToken)
         {
+
+            // Validation cryptographique du token Google
+            var googleUser = await _googleValidator.ValidateAsync(request.IdToken);
+
+            if (!googleUser.EmailVerified)
+                throw new UnauthorizedAccessException("Google email is not verified");
+
             var now = _dateTimeProvider.UtcNow;
+            var email = googleUser.Email.ToLowerInvariant();
             var isNewUser = false;
 
             // Cherche un user existant par email
             var user = await _context.Users
                 .Include(u => u.RefreshTokens)
-                .FirstOrDefaultAsync(u =>
-                    u.Email.Value == request.Email.ToLowerInvariant(),
-                    cancellationToken);
+                .FirstOrDefaultAsync(u => u.GoogleId == googleUser.GoogleId || u.Email.Value == email, cancellationToken);
 
             if (user is null)
             {
                 // Nouvel utilisateur via Google — pas de mot de passe
                 user = User.CreateWithGoogle(
-                    request.Email,
-                    request.FirstName,
-                    request.LastName,
-                    request.GoogleId,
+                    email,
+                    googleUser.FirstName,
+                    googleUser.LastName,
+                    googleUser.GoogleId,
                     now
                 );
 
@@ -55,28 +63,21 @@ namespace AiReviewHub.Application.Users.Commands.GoogleLogin
             }
             else
             {
+                // Anti account hijacking — vérifie que le GoogleId correspond
+                if (user.GoogleId is not null && user.GoogleId != googleUser.GoogleId)
+                    throw new UnauthorizedAccessException("Google account mismatch");
+
                 // User existant — lie le compte Google si pas encore fait
-                user.LinkGoogleAccount(request.GoogleId, now);
+                user.LinkGoogleAccount(googleUser.GoogleId, now);
             }
 
-            // Limite de sessions
-            var activeTokens = user.RefreshTokens
-                .Where(t => t.IsActive)
-                .OrderBy(t => t.CreatedAt)
-                .ToList();
-
-            if (activeTokens.Count >= 5)
-                activeTokens.First().Revoke(now);
-
-            // Génère les tokens
-            var tokens = _jwt.GenerateTokens(user.Id, user.Email.Value);
-            user.RefreshTokens.Add(tokens.RefreshToken);
+            var session = await _tokenService.CreateSessionAsync(user, now, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
 
             return new GoogleLoginResult(
-                tokens.AccessToken,
-                tokens.RawRefreshToken,
+                session.AccessToken,
+                session.RawRefreshToken,
                 isNewUser
             );
         }

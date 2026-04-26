@@ -6,12 +6,8 @@ using System.Text;
 
 namespace AiReviewHub.Application.Users.Commands.GoogleLogin
 {
-    public record GoogleLoginCommand(
-        string Email,
-        string FirstName,
-        string LastName,
-        string GoogleId
-    ) : IRequest<GoogleLoginResult>, ISensitiveRequest;
+    public record GoogleLoginCommand(string IdToken)
+        : IRequest<GoogleLoginResult>, ISensitiveRequest;
 
     public record GoogleLoginResult(
         string AccessToken,

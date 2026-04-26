@@ -23,12 +23,8 @@ builder.Services.AddHealthChecks();
 builder.Services.AddAppDI(builder.Configuration);
 
 builder.Services
-    .AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer("Bearer", options =>
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -43,14 +39,6 @@ builder.Services
             ),
             ClockSkew = TimeSpan.Zero
         };
-    })
-    .AddGoogle(options =>
-    {
-        options.ClientId = builder.Configuration["Google:ClientId"]!;
-        options.ClientSecret = builder.Configuration["Google:ClientSecret"]!;
-        options.CallbackPath = "/api/auth/google/callback";
-        options.Scope.Add("email");
-        options.Scope.Add("profile");
     });
 
 

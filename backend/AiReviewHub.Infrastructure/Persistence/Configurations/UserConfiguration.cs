@@ -61,6 +61,10 @@ namespace AiReviewHub.Infrastructure.Persistence.Configurations
                 .WithOne(p => p.User)
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Navigation(u => u.RefreshTokens)
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
+
         }
     }
 }

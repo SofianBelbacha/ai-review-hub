@@ -30,6 +30,11 @@ namespace AiReviewHub.Infrastructure
 
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
+            services.AddScoped<ITokenService, TokenService>();
+            
+            services.AddScoped<IGoogleTokenValidator, GoogleTokenValidator>();
+
+
             services.AddHangfire(config => config
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
                 .UseSimpleAssemblyNameTypeSerializer()
