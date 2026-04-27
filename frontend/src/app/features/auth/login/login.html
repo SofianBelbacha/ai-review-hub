@@ -80,6 +80,7 @@
             </svg>
             <input
               id="email"
+              name="email"
               class="auth-field__input"
               type="email"
               placeholder="vous@exemple.com"
@@ -103,6 +104,7 @@
             </svg>
             <input
               id="password"
+              name="password"
               class="auth-field__input"
               [type]="showPass() ? 'text' : 'password'"
               placeholder="••••••••"
@@ -176,6 +178,10 @@
         </svg>
         Continuer avec Google
       </button>
+
+      <div class="auth-oauth">
+        <div id="google-btn"></div>
+      </div>
 
       <!-- Lien inscription -->
       <p class="auth-form__switch">
