@@ -1,15 +1,39 @@
 // src/app/core/interceptors/auth.interceptor.ts
-import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse, HttpBackend, HttpClient } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { TokenStorageService } from '../services/token-storage.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const auth  = inject(AuthService);
-  const http  = inject(HttpClient);
+  const auth    = inject(AuthService);
+  const storage = inject(TokenStorageService);
+  const rawHttp = new HttpClient(inject(HttpBackend));
+
+  // Bypass pour les routes publiques
+  const publicRoutes = ['/auth/login', '/auth/register', '/auth/google', '/auth/refresh'];
+  if (publicRoutes.some(route => req.url.includes(route))) {
+    return next(req);
+  }
+
   const token = auth.getAccessToken();
+
+  // Refresh proactif — token expire dans moins de 60s
+  if (token && storage.isTokenExpiringSoon(60)) {
+    return auth.refreshTokens(rawHttp).pipe(
+      switchMap(tokens => {
+        const proactiveReq = req.clone({
+          setHeaders: { Authorization: `Bearer ${tokens.accessToken}` }
+        });
+        return next(proactiveReq);
+      }),
+      catchError(() => {
+        auth.logout(false);
+        return throwError(() => new Error('Session expired'));
+      })
+    );
+  }
 
   const authReq = token
     ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
@@ -17,34 +41,20 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Token expiré — tentative de refresh
       if (error.status === 401 && auth.getAccessToken()) {
-        const refreshToken = localStorage.getItem('refresh_token');
-
-        if (!refreshToken) {
-          auth.logout();
-          return throwError(() => error);
-        }
-
-        return http.post<{ accessToken: string; refreshToken: string }>(
-          `${environment.apiUrl}/auth/refresh`,
-          { token: refreshToken }
-        ).pipe(
+        return auth.refreshTokens(rawHttp).pipe(
           switchMap(tokens => {
-            auth.saveTokens(tokens);
-            // Rejoue la requête originale avec le nouveau token
             const retried = req.clone({
               setHeaders: { Authorization: `Bearer ${tokens.accessToken}` }
             });
             return next(retried);
           }),
           catchError(refreshError => {
-            auth.logout();
+            auth.logout(false);
             return throwError(() => refreshError);
           })
         );
       }
-
       return throwError(() => error);
     })
   );

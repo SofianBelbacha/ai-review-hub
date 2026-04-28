@@ -16,15 +16,9 @@ $transition-ease:         cubic-bezier(0.4, 0, 0.2, 1);
 // =============================================
 
 .shell {
-  display: grid;
-  grid-template-columns: $sidebar-width 1fr;
+  display: flex;  
   min-height: 100vh;
   background-color: var(--color-surface-lt);
-  transition: grid-template-columns $transition-speed $transition-ease;
-
-  &--collapsed {
-    grid-template-columns: $sidebar-width-collapsed 1fr;
-  }
 }
 
 
@@ -404,8 +398,18 @@ $transition-ease:         cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  min-width: 0; // important pour éviter l'overflow en grille
+  min-width: 0;
+  flex: 1;
+
+  // Compense la sidebar fixed
+  margin-left: $sidebar-width;
+  transition: margin-left $transition-speed $transition-ease;
+
+  .shell--collapsed & {
+    margin-left: $sidebar-width-collapsed;
+  }
 }
+
 
 
 // =============================================
@@ -623,7 +627,9 @@ $transition-ease:         cubic-bezier(0.4, 0, 0.2, 1);
 
 
 @media (max-width: 1023px) {
-  .shell { grid-template-columns: 1fr; }
+  .shell__main {
+    margin-left: 0;
+  }
 
   .sidebar {
     width: $sidebar-width;

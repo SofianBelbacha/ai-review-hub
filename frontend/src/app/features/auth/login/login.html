@@ -179,8 +179,13 @@
         Continuer avec Google
       </button>
 
+      <!-- Bouton Google avec skeleton -->
       <div class="auth-oauth">
-        <div id="google-btn"></div>
+        @if (googleLoading()) {
+          <div class="auth-oauth-skeleton" aria-hidden="true"></div>
+        } @else {
+          <div id="google-btn"></div>
+        }
       </div>
 
       <!-- Lien inscription -->

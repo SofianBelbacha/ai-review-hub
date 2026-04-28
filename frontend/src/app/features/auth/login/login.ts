@@ -21,23 +21,49 @@ export class Login implements AfterViewInit, OnDestroy {
   loading  = signal(false);
   showPass = signal(false);
   error    = signal('');
+  googleLoading = signal(true);
+
 
   // ─── Lifecycle ────────────────────────────────────────────
   ngAfterViewInit(): void {
-    this.initGoogleButton();
+    this.loadGoogle().then(() => {
+      this.googleLoading.set(false);
+      setTimeout(() => {
+        this.initGoogleButton();
+      });
+    });
   }
 
   ngOnDestroy(): void {
-    // Nettoyage si nécessaire
-    google?.accounts?.id?.cancel();
+  }
+
+  private loadGoogle(): Promise<void> {
+    return new Promise(resolve => {
+      if (typeof google !== 'undefined') {
+        resolve();
+        return;
+      }
+
+      const interval = setInterval(() => {
+        if (typeof google !== 'undefined') {
+          clearInterval(interval);
+          resolve();
+        }
+      }, 100);
+
+      // Timeout de sécurité — 10s max
+      setTimeout(() => {
+        clearInterval(interval);
+        this.error.set('Impossible de charger Google Sign-In.');
+      }, 10_000);
+    });
   }
 
   // ─── Google Identity Services ─────────────────────────────
   private initGoogleButton(): void {
+    
     if (typeof google === 'undefined') {
-      // Script pas encore chargé — réessaie après 500ms
       console.log('Google SDK pas encore chargé, retry...');
-      setTimeout(() => this.initGoogleButton(), 500);
       return;
     }
 
