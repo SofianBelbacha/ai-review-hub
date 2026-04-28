@@ -1,9 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, inject, NgZone, OnDestroy, signal } from '@angular/core';
+import { AfterViewInit, Component, inject, OnDestroy, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { environment } from '../../../../environments/environment';
+import { GoogleAuthService } from '../../../core/services/google-auth.service';
+import { parseApiError } from '../../../core/utils/api-error.utils';
+
 
 @Component({
   selector: 'app-login',
@@ -14,7 +17,8 @@ import { environment } from '../../../../environments/environment';
 export class Login implements AfterViewInit, OnDestroy {
   private readonly auth   = inject(AuthService);
   private readonly router = inject(Router);
-  private readonly zone   = inject(NgZone);
+  private readonly googleAuth = inject(GoogleAuthService);
+
 
   email    = signal('');
   password = signal('');
@@ -25,12 +29,15 @@ export class Login implements AfterViewInit, OnDestroy {
 
 
   // ─── Lifecycle ────────────────────────────────────────────
+
   ngAfterViewInit(): void {
-    this.loadGoogle().then(() => {
+    this.googleAuth.load().then(() => {
+      this.googleAuth.initialize(
+        environment.googleClientId,
+        (response) => this.handleGoogleResponse(response)
+      );
+      this.googleAuth.renderButton('google-btn', 'continue_with');
       this.googleLoading.set(false);
-      setTimeout(() => {
-        this.initGoogleButton();
-      });
     });
   }
 
@@ -60,37 +67,6 @@ export class Login implements AfterViewInit, OnDestroy {
   }
 
   // ─── Google Identity Services ─────────────────────────────
-  private initGoogleButton(): void {
-    
-    if (typeof google === 'undefined') {
-      console.log('Google SDK pas encore chargé, retry...');
-      return;
-    }
-
-    google.accounts.id.initialize({
-      client_id: environment.googleClientId,
-      callback: (response) => {
-        // NgZone — Google appelle le callback hors de la zone Angular
-        this.zone.run(() => this.handleGoogleResponse(response));
-      },
-      auto_select: false,
-      cancel_on_tap_outside: true,
-    });
-
-    google.accounts.id.renderButton(
-      document.getElementById('google-btn')!,
-      {
-        type: 'standard',
-        shape: 'rectangular',
-        theme: 'outline',
-        text: 'continue_with',
-        size: 'large',
-        logo_alignment: 'left',
-        width: '100%',
-      }
-    );
-  }
-
   private handleGoogleResponse(response: google.accounts.id.CredentialResponse): void {
     if (!response.credential) {
       this.error.set('Échec de la connexion Google.');
@@ -134,11 +110,7 @@ export class Login implements AfterViewInit, OnDestroy {
       },
       error: (err) => {
         this.loading.set(false);
-        this.error.set(
-          err.status === 401
-            ? 'Email ou mot de passe incorrect.'
-            : 'Une erreur est survenue. Réessayez.'
-        );
+        this.error.set(parseApiError(err));
       }
     });
   }

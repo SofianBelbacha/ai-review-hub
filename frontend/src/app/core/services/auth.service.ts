@@ -8,7 +8,6 @@ import { TokenStorageService } from './token-storage.service';
 
 export interface AuthTokens {
   accessToken: string;
-  refreshToken: string;
 }
 
 export interface GoogleAuthResponse extends AuthTokens {
@@ -35,7 +34,7 @@ export class AuthService {
   // ─── Auth classique ───────────────────────────────────────
   login(email: string, password: string): Observable<AuthTokens> {
     return this.http
-      .post<AuthTokens>(`${this.API}/auth/login`, { email, password })
+      .post<AuthTokens>(`${this.API}/auth/login`, { email, password }, { withCredentials: true })
       .pipe(tap(tokens => this.saveTokens(tokens)));
   }
 
@@ -47,14 +46,14 @@ export class AuthService {
   ): Observable<AuthTokens> {
     return this.http
       .post<AuthTokens>(`${this.API}/auth/register`,
-        { email, password, firstName, lastName })
+        { email, password, firstName, lastName }, { withCredentials: true })
       .pipe(tap(tokens => this.saveTokens(tokens)));
   }
 
   // ─── Google OAuth ─────────────────────────────────────────
   loginWithGoogle(idToken: string): Observable<GoogleAuthResponse> {
     return this.http
-      .post<GoogleAuthResponse>(`${this.API}/auth/google`, { idToken })
+      .post<GoogleAuthResponse>(`${this.API}/auth/google`, { idToken }, { withCredentials: true })
       .pipe(tap(result => this.saveTokens(result)));
   }
 
@@ -72,18 +71,8 @@ export class AuthService {
     this.isRefreshing = true;
     this.refreshSubject.next(null); // bloque les autres
 
-    const refreshToken = this.storage.getRefreshToken();
-
-    if (!refreshToken) {
-      this.isRefreshing = false;
-      this.refreshSubject.complete();
-      this.refreshSubject = new BehaviorSubject<AuthTokens | null>(null);
-      this.logout();
-      return throwError(() => new Error('No refresh token'));
-    }
-
     return rawHttp
-      .post<AuthTokens>(`${this.API}/auth/refresh`, { token: refreshToken })
+      .post<AuthTokens>(`${this.API}/auth/refresh`, {}, { withCredentials: true })
       .pipe(
         tap(tokens => {
           this.saveTokens(tokens);
@@ -96,7 +85,7 @@ export class AuthService {
           this.refreshSubject.complete();
           // Recrée un nouveau subject sain pour les futurs refresh
           this.refreshSubject = new BehaviorSubject<AuthTokens | null>(null);
-          this.logout();
+          this.logout(false);
           return throwError(() => error);
         })
       );
@@ -104,7 +93,7 @@ export class AuthService {
 
   // ─── Session ──────────────────────────────────────────────
   saveTokens(tokens: AuthTokens): void {
-    this.storage.saveTokens(tokens);
+    this.storage.saveAccessToken(tokens.accessToken);
     this.isAuthenticated.set(true);
   }
 
@@ -113,14 +102,18 @@ export class AuthService {
   }
 
   logout(revokeOnServer = true): void {
-    const refreshToken = this.storage.getRefreshToken();
 
-    if (revokeOnServer && refreshToken) {
-      // Fire and forget — on logout même si ça échoue
-      this.rawHttp.post(`${this.API}/auth/revoke`, { token: refreshToken }).subscribe({error: () => {}});
+    if (revokeOnServer) {
+      // Fire and forget — cookie envoyé automatiquement
+      this.rawHttp
+        .post(
+          `${this.API}/auth/revoke`,
+          { revokeAll: false },
+          { withCredentials: true })
+        .subscribe({ error: () => {} });
     }
 
-    this.storage.clearTokens();
+    this.storage.clearAll();
     this.isAuthenticated.set(false);
 
     // Annule état refresh

@@ -1,37 +1,33 @@
 import { Injectable } from '@angular/core';
-import { AuthTokens } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class TokenStorageService {
-  // TODO prod : access token en mémoire + refresh token en httpOnly cookie
-  private readonly ACCESS_KEY  = 'access_token';
-  private readonly REFRESH_KEY = 'refresh_token';
+  // Access token en mémoire — perdu au refresh de page (normal)
+  private accessToken: string | null = null;
 
-  saveTokens(tokens: AuthTokens): void {
-    localStorage.setItem(this.ACCESS_KEY,  tokens.accessToken);
-    localStorage.setItem(this.REFRESH_KEY, tokens.refreshToken);
+  // ─── Access token (mémoire) ───────────────────────────────
+  saveAccessToken(token: string): void {
+    this.accessToken = token;
   }
 
   getAccessToken(): string | null {
-    return localStorage.getItem(this.ACCESS_KEY);
+    return this.accessToken;
   }
 
-  getRefreshToken(): string | null {
-    return localStorage.getItem(this.REFRESH_KEY);
+  clearAccessToken(): void {
+    this.accessToken = null;
   }
 
-  clearTokens(): void {
-    localStorage.removeItem(this.ACCESS_KEY);
-    localStorage.removeItem(this.REFRESH_KEY);
-  }
+  // ─── Refresh token (httpOnly cookie géré par le navigateur) ──
+  // Le refresh token est envoyé automatiquement par le navigateur
+  // via withCredentials — on ne le lit jamais côté JS
 
-  // ─── Décodage JWT pour expiration proactive ────────────────
+  // ─── JWT decode pour expiration proactive ─────────────────
   getTokenExpiration(): Date | null {
-    const token = this.getAccessToken();
-    if (!token) return null;
+    if (!this.accessToken) return null;
 
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(this.accessToken.split('.')[1]));
       return payload.exp ? new Date(payload.exp * 1000) : null;
     } catch {
       return null;
@@ -42,5 +38,11 @@ export class TokenStorageService {
     const exp = this.getTokenExpiration();
     if (!exp) return false;
     return (exp.getTime() - Date.now()) < thresholdSeconds * 1000;
+  }
+
+  // ─── Clear complet ─────────────────────────────────────────
+  clearAll(): void {
+    this.accessToken = null;
+    // Le cookie refresh_token est supprimé par le backend via /auth/revoke
   }
 }

@@ -1,4 +1,5 @@
-﻿using AiReviewHub.Application.Users.Commands.GenerateRefreshToken;
+﻿using AiReviewHub.Api.Extensions;
+using AiReviewHub.Application.Users.Commands.GenerateRefreshToken;
 using AiReviewHub.Application.Users.Commands.GoogleLogin;
 using AiReviewHub.Application.Users.Commands.LoginUser;
 using AiReviewHub.Application.Users.Commands.RegisterUser;
@@ -35,7 +36,20 @@ namespace AiReviewHub.Api.Controllers
                 request.LastName);
 
             var result = await _mediator.Send(command, cancellationToken);
-            return Created(string.Empty, result);
+
+            // Refresh token → cookie httpOnly
+            HttpContext.SetRefreshTokenCookie(result.RefreshToken);
+
+            // Access token → body uniquement
+            return Created(string.Empty, new
+            {
+                result.AccessToken,
+                result.Id,
+                result.Email,
+                result.FirstName,
+                result.LastName,
+                result.Plan
+            });
         }
 
         [HttpPost("login")]
@@ -44,27 +58,46 @@ namespace AiReviewHub.Api.Controllers
         {
             var command = new LoginUserCommand(request.Email, request.Password);
             var result = await _mediator.Send(command, cancellationToken);
-            return Ok(result);
+            HttpContext.SetRefreshTokenCookie(result.RefreshToken);
+
+            return Ok(new { result.AccessToken });
+
         }
 
         [HttpPost("refresh")]
         [AllowAnonymous]
-        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Refresh(CancellationToken cancellationToken)
         {
+            // Refresh token lu depuis le cookie
+            var refreshToken = Request.Cookies["refresh_token"];
+
+            if (string.IsNullOrEmpty(refreshToken))
+                return Unauthorized("Refresh token not found");
+
             var result = await _mediator.Send(
-                new RefreshTokenCommand(request.Token),
+                new RefreshTokenCommand(refreshToken),
                 cancellationToken);
 
-            return Ok(result);
+            HttpContext.SetRefreshTokenCookie(result.RefreshToken);
+
+            return Ok(new { result.AccessToken });
         }
 
         [HttpPost("revoke")]
         [Authorize]
         public async Task<IActionResult> Revoke([FromBody] RevokeTokenRequest request, CancellationToken cancellationToken)
         {
+            var refreshToken = Request.Cookies["refresh_token"];
+
+            if (string.IsNullOrEmpty(refreshToken))
+                return NoContent();
+
             await _mediator.Send(
-                new RevokeTokenCommand(request.Token, request.RevokeAll),
+                new RevokeTokenCommand(refreshToken, request.RevokeAll),
                 cancellationToken);
+
+            // Efface le cookie
+            HttpContext.ClearRefreshTokenCookie();
 
             return NoContent();
         }
@@ -79,7 +112,9 @@ namespace AiReviewHub.Api.Controllers
                 new GoogleLoginCommand(request.IdToken),
                 cancellationToken);
 
-            return Ok(result);
+            HttpContext.SetRefreshTokenCookie(result.RefreshToken);
+
+            return Ok(new { result.AccessToken, result.IsNewUser });
         }
 
     }
