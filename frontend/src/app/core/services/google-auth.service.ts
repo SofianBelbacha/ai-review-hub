@@ -9,6 +9,8 @@ export type GoogleButtonText =
 @Injectable({ providedIn: 'root' })
 export class GoogleAuthService {
   private readonly zone = inject(NgZone);
+  private initialized = false;
+
 
   load(): Promise<void> {
     return new Promise(resolve => {
@@ -28,16 +30,16 @@ export class GoogleAuthService {
     });
   }
 
-  initialize(
-    clientId: string,
-    callback: (response: google.accounts.id.CredentialResponse) => void
-  ): void {
+  initialize(clientId: string, callback: (response: google.accounts.id.CredentialResponse) => void): void {
+    if (this.initialized) return;
     google.accounts.id.initialize({
       client_id: clientId,
       callback: (response) => this.zone.run(() => callback(response)),
       auto_select: false,
       cancel_on_tap_outside: true,
     });
+
+    this.initialized = true;
   }
 
   renderButton(elementId: string, text: GoogleButtonText = 'continue_with'): void {

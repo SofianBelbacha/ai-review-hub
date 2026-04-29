@@ -2,6 +2,7 @@
 using AiReviewHub.Domain.Abstractions;
 using AiReviewHub.Domain.Entities;
 using AiReviewHub.Domain.Exceptions;
+using AiReviewHub.Domain.ValueObjects;
 using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +38,7 @@ namespace AiReviewHub.Application.Users.Commands.RegisterUser
         {
             // Vérifie que l'email n'est pas déjà utilisé
             var emailExists = await _context.Users
-                .AnyAsync(u => u.Email.Value == request.Email.ToLowerInvariant(),
+                .AnyAsync(u => u.Email == Email.Create(request.Email),
                     cancellationToken);
 
             if (emailExists)
@@ -63,13 +64,16 @@ namespace AiReviewHub.Application.Users.Commands.RegisterUser
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var result = _mapper.Map<RegisterUserResult>(user);
-            return result with
-            {
-                AccessToken = session.AccessToken,
-                RefreshToken = session.RawRefreshToken
-            };
-
+            return new RegisterUserResult(
+                user.Id,
+                user.Email.Value,
+                user.FirstName,
+                user.LastName,
+                user.Plan.ToString(),
+                session.AccessToken,
+                session.RawRefreshToken,
+                user.CreatedAt
+            );
         }
     }
 }

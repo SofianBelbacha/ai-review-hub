@@ -8,7 +8,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -121,8 +120,7 @@ namespace AiReviewHub.Api.Controllers
 
     public record RegisterRequest(string Email, string Password, string FirstName, string LastName);
     public record LoginRequest(string Email, string Password);
-    public record RefreshTokenRequest(string Token);
-    public record RevokeTokenRequest(string Token, bool RevokeAll = false);
+    public record RevokeTokenRequest(bool RevokeAll = false);
     public record GoogleLoginRequest(string IdToken);
 
 
