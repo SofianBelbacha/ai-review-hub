@@ -12,6 +12,8 @@ namespace AiReviewHub.Application.Abstractions
         Task<SessionResult> CreateSessionAsync(
             User user,
             DateTime now,
+            IAppDbContext context,
             CancellationToken cancellationToken = default);
+        
     }
 }

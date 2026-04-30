@@ -165,17 +165,32 @@
             <span class="sidebar__user-name">Jean Dupont</span>
             <span class="sidebar__user-email">jean&#64;exemple.com</span>
           </div>
-          <button class="sidebar__user-logout" type="button" aria-label="Se déconnecter">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M6 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3"/>
-              <polyline points="10 11 14 8 10 5"/>
-              <line x1="14" y1="8" x2="5" y2="8"/>
-            </svg>
+          <button
+            class="sidebar__user-logout"
+            type="button"
+            aria-label="Se déconnecter"
+            [disabled]="logoutLoading()"
+            [class.sidebar__user-logout--loading]="logoutLoading()"
+            (click)="logout()">
+
+            @if (logoutLoading()) {
+              <!-- Spinner pendant le revoke -->
+              <svg class="sidebar__logout-spinner" viewBox="0 0 16 16" fill="none"
+                  stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <circle cx="8" cy="8" r="6" stroke-opacity="0.3"/>
+                <path d="M8 2a6 6 0 0 1 6 6"/>
+              </svg>
+            } @else {
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M6 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3"/>
+                <polyline points="10 11 14 8 10 5"/>
+                <line x1="14" y1="8" x2="5" y2="8"/>
+              </svg>
+            }
           </button>
         }
       </div>
-
     </nav>
   </aside>
 

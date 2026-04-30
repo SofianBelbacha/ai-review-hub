@@ -2,7 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpBackend, HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, BehaviorSubject, throwError, filter, take, switchMap, of } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { tap, catchError, finalize } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { TokenStorageService } from './token-storage.service';
 
@@ -102,6 +102,13 @@ export class AuthService {
   }
 
   logout(revokeOnServer = true): void {
+    const completeLogout = () => {
+      this.storage.clearAll();
+      this.isAuthenticated.set(false);
+      this.isRefreshing = false;
+      this.refreshSubject.next(null);
+      this.router.navigate(['/login']);
+    };
 
     if (revokeOnServer) {
       // Fire and forget — cookie envoyé automatiquement
@@ -110,16 +117,10 @@ export class AuthService {
           `${this.API}/auth/revoke`,
           { revokeAll: false },
           { withCredentials: true })
+        .pipe(
+          // Logout local dans tous les cas — succès ou échec du revoke
+          finalize((completeLogout)))
         .subscribe({ error: () => {} });
     }
-
-    this.storage.clearAll();
-    this.isAuthenticated.set(false);
-
-    // Annule état refresh
-    this.isRefreshing = false;
-    this.refreshSubject.next(null);
-
-    this.router.navigate(['/login']);
   }
 }

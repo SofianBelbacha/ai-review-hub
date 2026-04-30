@@ -22,13 +22,13 @@ namespace AiReviewHub.Application.Users.Commands.GenerateRefreshToken
             _dateTimeProvider = dateTimeProvider;
         }
 
-        public async Task<RefreshTokenResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+        public async Task<RefreshTokenResult> Handle(
+            RefreshTokenCommand request,
+            CancellationToken cancellationToken)
         {
-
-            // Hash du token reçu pour comparer avec la DB
             var tokenHash = RefreshToken.Hash(request.Token);
 
-            // Lookup — cherche directement le token par son hash
+            // Cherche le token existant avec son user et ses tokens
             var existingToken = await _context.RefreshTokens
                 .Include(t => t.User)
                     .ThenInclude(u => u.RefreshTokens)
@@ -36,13 +36,13 @@ namespace AiReviewHub.Application.Users.Commands.GenerateRefreshToken
                 ?? throw new UnauthorizedAccessException("Invalid refresh token");
 
             var user = existingToken.User;
+            var now = _dateTimeProvider.UtcNow;
 
-            // Token révoqué — détection de réutilisation (rotation attack)
+            // Détection de réutilisation
             if (existingToken.IsRevoked)
             {
-                // Révoque TOUS les tokens du user par sécurité
-                foreach (var token in user.RefreshTokens.Where(t => t.IsActive))
-                    token.Revoke(_dateTimeProvider.UtcNow);
+                foreach (var t in user.RefreshTokens.Where(t => t.IsActive))
+                    t.Revoke(now);
 
                 await _context.SaveChangesAsync(cancellationToken);
                 throw new UnauthorizedAccessException(
@@ -55,33 +55,32 @@ namespace AiReviewHub.Application.Users.Commands.GenerateRefreshToken
             // Génère de nouveaux tokens
             var tokens = _jwt.GenerateTokens(user.Id, user.Email.Value);
 
-            // Révoque l'ancien avec référence au nouveau
-            existingToken.Revoke(_dateTimeProvider.UtcNow, tokens.RawRefreshToken);
+            // Révoque l'ancien
+            existingToken.Revoke(now, tokens.RawRefreshToken);
 
-            // Limite de sessions actives à 5
+            // Limite de sessions — révoque le plus ancien si nécessaire
             var activeTokens = user.RefreshTokens
                 .Where(t => t.IsActive)
                 .OrderBy(t => t.CreatedAt)
                 .ToList();
 
             if (activeTokens.Count >= 5)
-            {
-                var oldest = activeTokens.First();
-                oldest.Revoke(_dateTimeProvider.UtcNow);
-            }
+                activeTokens.First().Revoke(now);
 
-            // Attache le nouveau token
-            user.AddRefreshToken(tokens.RefreshToken);
-
-            // Nettoie les tokens inactifs
-            var toRemove = user.RefreshTokens
-                .Where(t => !t.IsActive && t.RevokedAt < _dateTimeProvider.UtcNow.AddDays(-30))
-                .ToList();
-
-            foreach (var old in toRemove)
-                user.CleanupRefreshTokens(_dateTimeProvider.UtcNow);
-
+            // Sauvegarde uniquement les révocations
             await _context.SaveChangesAsync(cancellationToken);
+
+            // Insère le nouveau token dans un SaveChanges séparé
+            _context.RefreshTokens.Add(tokens.RefreshToken);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            // Nettoyage des anciens tokens — requête directe
+            await _context.RefreshTokens
+                .Where(t =>
+                    t.UserId == user.Id &&
+                    t.RevokedAt != null &&
+                    t.RevokedAt < now.AddDays(-30))
+                .ExecuteDeleteAsync(cancellationToken);
 
             return new RefreshTokenResult(tokens.AccessToken, tokens.RawRefreshToken);
         }

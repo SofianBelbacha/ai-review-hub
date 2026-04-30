@@ -1,6 +1,7 @@
-import { Component, HostListener, signal } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
  
 interface NavItem {
   label: string;
@@ -17,8 +18,11 @@ interface NavItem {
 })
 export class DashboardShell {
   
+  private readonly auth = inject(AuthService);
+
   sidebarCollapsed = signal(false);
   mobileMenuOpen   = signal(false);
+  logoutLoading    = signal(false);
  
   // Projet actif simulé
   currentProject = signal({ name: 'Refonte e-commerce', plan: 'Pro' });
@@ -35,6 +39,16 @@ export class DashboardShell {
     { label: 'Paramètres', path: '/dashboard/settings', icon: 'settings'},
     { label: 'Aide', path: '/dashboard/help', icon: 'help'},
   ];
+
+    // ─── Logout ───────────────────────────────────────────────
+  logout(): void {
+    if (this.logoutLoading()) return; // évite double-clic
+    this.logoutLoading.set(true);
+
+    // AuthService gère le revoke + redirect /login
+    this.auth.logout();
+  }
+
  
   toggleSidebar(): void {
     this.sidebarCollapsed.update(v => !v);

@@ -306,21 +306,9 @@
           Continuer avec Google
         </button>
 
-        @if (step() === 1) {
-          <div class="auth-sep">
-            <span class="auth-sep__line" aria-hidden="true"></span>
-            <span class="auth-sep__label">ou</span>
-            <span class="auth-sep__line" aria-hidden="true"></span>
-          </div>
-
-          <div class="auth-oauth-wrap">
-            @if (googleLoading()) {
-              <div class="auth-oauth-skeleton" aria-hidden="true"></div>
-            } @else {
-              <div id="google-btn-register"></div>
-            }
-          </div>
-        }
+        <div class="auth-oauth-wrap">
+          <div id="google-btn-register" [class.auth-oauth-skeleton]="googleLoading()"></div>
+        </div>
       }
 
       <!-- Lien connexion -->

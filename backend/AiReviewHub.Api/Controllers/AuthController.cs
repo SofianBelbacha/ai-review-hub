@@ -83,7 +83,7 @@ namespace AiReviewHub.Api.Controllers
         }
 
         [HttpPost("revoke")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Revoke([FromBody] RevokeTokenRequest request, CancellationToken cancellationToken)
         {
             var refreshToken = Request.Cookies["refresh_token"];

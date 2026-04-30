@@ -1,6 +1,7 @@
 ﻿using AiReviewHub.Application.Abstractions;
 using AiReviewHub.Domain.Abstractions;
 using AiReviewHub.Domain.Entities;
+using AiReviewHub.Domain.ValueObjects;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -32,7 +33,7 @@ namespace AiReviewHub.Application.Users.Commands.LoginUser
         {
             var user = await _context.Users
                 .Include(u => u.RefreshTokens)
-                .FirstOrDefaultAsync(u => u.Email.Value == request.Email.ToLowerInvariant(), cancellationToken)
+                .FirstOrDefaultAsync(u => u.Email == Email.Create(request.Email), cancellationToken)
                 ?? throw new UnauthorizedAccessException("Invalid credentials");
 
             if (user.IsOAuthUser)
@@ -43,8 +44,7 @@ namespace AiReviewHub.Application.Users.Commands.LoginUser
                 throw new UnauthorizedAccessException("Invalid credentials");
 
             // Délègue la création de session à ITokenService
-            var session = await _tokenService.CreateSessionAsync(
-                user, _dateTimeProvider.UtcNow, cancellationToken);
+            var session = await _tokenService.CreateSessionAsync(user, _dateTimeProvider.UtcNow, _context, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
 

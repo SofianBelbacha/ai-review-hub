@@ -14,46 +14,49 @@ namespace AiReviewHub.Application.Users.Commands.RevokeToken
     {
         private readonly IAppDbContext _context;
         private readonly IDateTimeProvider _dateTimeProvider;
-        private readonly ICurrentUserService _currentUser;
 
-        public RevokeTokenHandler(
-            IAppDbContext context,
-            IDateTimeProvider dateTimeProvider,
-            ICurrentUserService currentUser)
+        public RevokeTokenHandler(IAppDbContext context, IDateTimeProvider dateTimeProvider)
         {
             _context = context;
             _dateTimeProvider = dateTimeProvider;
-            _currentUser = currentUser;
         }
 
         public async Task<Unit> Handle(
             RevokeTokenCommand request,
             CancellationToken cancellationToken)
         {
-            var user = await _context.Users
-                .Include(u => u.RefreshTokens)
-                .FirstOrDefaultAsync(u => u.Id == _currentUser.UserId, cancellationToken)
-                ?? throw new NotFoundException("User not found");
+            var now = _dateTimeProvider.UtcNow;
 
             if (request.RevokeAll)
             {
-                // Logout global — révoque toutes les sessions
-                foreach (var token in user.RefreshTokens.Where(t => t.IsActive))
-                    token.Revoke(_dateTimeProvider.UtcNow);
-            }
-            else
-            {
+                // Pour revokeAll on a besoin du user — via le token
                 var tokenHash = RefreshToken.Hash(request.Token);
 
-                var token = user.RefreshTokens
-                    .FirstOrDefault(t => t.TokenHash == tokenHash)
-                    ?? throw new NotFoundException("Token not found");
+                var userForRevoke = await _context.Users
+                    .Include(u => u.RefreshTokens)
+                    .FirstOrDefaultAsync(u =>
+                        u.RefreshTokens.Any(t => t.TokenHash == tokenHash),
+                        cancellationToken)
+                    ?? throw new NotFoundException("User not found");
 
-                if (!token.IsActive)
-                    throw new InvalidOperationException("Token is already inactive");
+                foreach (var t in userForRevoke.RefreshTokens.Where(t => t.IsActive))
+                    t.Revoke(now);
 
-                token.Revoke(_dateTimeProvider.UtcNow);
+                await _context.SaveChangesAsync(cancellationToken);
+                return Unit.Value;
             }
+
+            // Révocation simple — cherche directement le token
+            var hash = RefreshToken.Hash(request.Token);
+
+            var token = await _context.RefreshTokens
+                .FirstOrDefaultAsync(t => t.TokenHash == hash, cancellationToken)
+                ?? throw new NotFoundException("Token not found");
+
+            if (!token.IsActive)
+                throw new InvalidOperationException("Token is already inactive");
+
+            token.Revoke(now);
             await _context.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;

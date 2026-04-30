@@ -91,21 +91,11 @@ namespace AiReviewHub.Domain.Entities
 
         public void AddRefreshToken(RefreshToken token)
         {
-            // Nettoyage des tokens inactifs anciens
-            var toRemove = RefreshTokens
-                .Where(t => !t.IsActive && t.RevokedAt < token.CreatedAt.AddDays(-30))
-                .ToList();
-
-            foreach (var old in toRemove)
-                _refreshTokens.Remove(old);
-
-            _refreshTokens.Add(token);
-
         }
 
         public void RevokeOldestActiveSession(DateTime now)
         {
-            var oldest = RefreshTokens
+            var oldest = _refreshTokens
                 .Where(t => t.IsActive)
                 .OrderBy(t => t.CreatedAt)
                 .FirstOrDefault();

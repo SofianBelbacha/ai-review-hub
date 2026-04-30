@@ -16,25 +16,29 @@ namespace AiReviewHub.Infrastructure.Services
             _jwt = jwt;
         }
 
-        public Task<SessionResult> CreateSessionAsync(User user, DateTime now, CancellationToken cancellationToken = default)
+        // TokenService.cs
+        public async Task<SessionResult> CreateSessionAsync(
+            User user,
+            DateTime now,
+            IAppDbContext context,
+            CancellationToken cancellationToken = default)
         {
             const int MaxActiveSessions = 5;
-            // Limite de sessions — délégué à l'entité
+
             var activeCount = user.RefreshTokens.Count(t => t.IsActive);
-            
             if (activeCount >= MaxActiveSessions)
                 user.RevokeOldestActiveSession(now);
 
-            // Génère les tokens
             var tokens = _jwt.GenerateTokens(user.Id, user.Email.Value);
 
-            // Modification de l'entité via sa méthode — DDD pur
-            user.AddRefreshToken(tokens.RefreshToken);
+            // Révocations d'abord
+            await context.SaveChangesAsync(cancellationToken);
 
-            return Task.FromResult(new SessionResult(
-                tokens.AccessToken,
-                tokens.RawRefreshToken
-            ));
+            // Nouveau token séparément
+            context.RefreshTokens.Add(tokens.RefreshToken);
+            await context.SaveChangesAsync(cancellationToken);
+
+            return new SessionResult(tokens.AccessToken, tokens.RawRefreshToken);
         }
     }
 }

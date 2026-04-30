@@ -16,7 +16,6 @@ namespace AiReviewHub.Application.Users.Commands.GoogleLogin
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IGoogleTokenValidator _googleValidator;
 
-
         public GoogleLoginHandler(
             IAppDbContext context,
             IDateTimeProvider dateTimeProvider,
@@ -71,7 +70,7 @@ namespace AiReviewHub.Application.Users.Commands.GoogleLogin
                 user.LinkGoogleAccount(googleUser.GoogleId, now);
             }
 
-            var session = await _tokenService.CreateSessionAsync(user, now, cancellationToken);
+            var session = await _tokenService.CreateSessionAsync(user, _dateTimeProvider.UtcNow, _context, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
 

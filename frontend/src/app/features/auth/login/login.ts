@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, inject, OnDestroy, signal } from '@angular/core';
+import { AfterViewInit, Component, Injector, inject, OnDestroy, afterNextRender, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -18,6 +18,8 @@ export class Login implements AfterViewInit, OnDestroy {
   private readonly auth   = inject(AuthService);
   private readonly router = inject(Router);
   private readonly googleAuth = inject(GoogleAuthService);
+  private readonly injector = inject(Injector);
+
 
 
   email    = signal('');
@@ -38,6 +40,7 @@ export class Login implements AfterViewInit, OnDestroy {
       );
       this.googleAuth.renderButton('google-btn', 'continue_with');
       this.googleLoading.set(false);
+
     });
   }
 

@@ -63,7 +63,7 @@ export class Register implements AfterViewInit, OnDestroy {
         environment.googleClientId,
         (response) => this.handleGoogleResponse(response)
       );
-      this.googleAuth.renderButton('google-btn', 'continue_with');
+      this.googleAuth.renderButton('google-btn-register', 'continue_with');
       this.googleLoading.set(false);
     });
   }
@@ -125,7 +125,7 @@ export class Register implements AfterViewInit, OnDestroy {
     ).subscribe({
       next: () => {
         // saveTokens déjà appelé dans AuthService via tap()
-        this.router.navigate(['/onboarding']);
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         this.loading.set(false);

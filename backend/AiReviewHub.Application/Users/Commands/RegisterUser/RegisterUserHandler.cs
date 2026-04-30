@@ -60,7 +60,7 @@ namespace AiReviewHub.Application.Users.Commands.RegisterUser
             _context.Users.Add(user);
 
             // Délègue la création de session à ITokenService
-            var session = await _tokenService.CreateSessionAsync(user, _dateTimeProvider.UtcNow, cancellationToken);
+            var session = await _tokenService.CreateSessionAsync(user, _dateTimeProvider.UtcNow, _context, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
 

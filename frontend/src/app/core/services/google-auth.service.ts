@@ -9,8 +9,7 @@ export type GoogleButtonText =
 @Injectable({ providedIn: 'root' })
 export class GoogleAuthService {
   private readonly zone = inject(NgZone);
-  private initialized = false;
-
+  private initialized  = false;  
 
   load(): Promise<void> {
     return new Promise(resolve => {
@@ -31,14 +30,21 @@ export class GoogleAuthService {
   }
 
   initialize(clientId: string, callback: (response: google.accounts.id.CredentialResponse) => void): void {
-    if (this.initialized) return;
+    if (this.initialized) {
+      google.accounts.id.initialize({
+        client_id: clientId,
+        callback: (response) => this.zone.run(() => callback(response)),
+        auto_select: false,
+        cancel_on_tap_outside: true,
+      });
+      return;
+    }
     google.accounts.id.initialize({
       client_id: clientId,
       callback: (response) => this.zone.run(() => callback(response)),
       auto_select: false,
       cancel_on_tap_outside: true,
     });
-
     this.initialized = true;
   }
 
@@ -55,5 +61,13 @@ export class GoogleAuthService {
       logo_alignment: 'left',
       width: '100%',
     });
+  }
+
+  // ─── Reset au logout ──────────────────────────────────────
+  reset(): void {
+    this.initialized = false;
+    if (typeof google !== 'undefined') {
+      google.accounts.id.cancel();
+    }
   }
 }
