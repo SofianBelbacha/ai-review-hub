@@ -44,7 +44,9 @@ namespace AiReviewHub.Application.Users.Commands.LoginUser
                 throw new UnauthorizedAccessException("Invalid credentials");
 
             // Délègue la création de session à ITokenService
-            var session = await _tokenService.CreateSessionAsync(user, _dateTimeProvider.UtcNow, _context, cancellationToken);
+            var session = _tokenService.PrepareSession(user, _dateTimeProvider.UtcNow);
+
+            _context.RefreshTokens.Add(session.RefreshTokenEntity);
 
             await _context.SaveChangesAsync(cancellationToken);
 

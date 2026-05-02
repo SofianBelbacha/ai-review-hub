@@ -5,15 +5,11 @@ using System.Text;
 
 namespace AiReviewHub.Application.Abstractions
 {
-    public record SessionResult(string AccessToken, string RawRefreshToken);
+    public record SessionResult(string AccessToken, string RawRefreshToken, RefreshToken RefreshTokenEntity);
 
     public interface ITokenService
     {
-        Task<SessionResult> CreateSessionAsync(
-            User user,
-            DateTime now,
-            IAppDbContext context,
-            CancellationToken cancellationToken = default);
+        SessionResult PrepareSession(User user, DateTime now);
         
     }
 }

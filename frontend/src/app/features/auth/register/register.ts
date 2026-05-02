@@ -59,11 +59,11 @@ export class Register implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.googleAuth.load().then(() => {
-      this.googleAuth.initialize(
-        environment.googleClientId,
-        (response) => this.handleGoogleResponse(response)
+      this.googleAuth.renderButton(
+        'google-btn-register',
+        (response) => this.handleGoogleResponse(response),
+        'signup_with'
       );
-      this.googleAuth.renderButton('google-btn-register', 'continue_with');
       this.googleLoading.set(false);
     });
   }

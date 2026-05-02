@@ -1,5 +1,8 @@
 import { Routes } from '@angular/router';
 import { DashboardShell } from './features/dashboard/shell/dashboard-shell';
+import { authGuard }  from './core/guards/auth.guard';
+import { guestGuard } from './core/guards/guest.guard';
+
 
 export const routes: Routes = [
     {
@@ -9,14 +12,17 @@ export const routes: Routes = [
     },
     {
         path: 'login',
+        canActivate: [guestGuard],
         loadComponent: () => import('./features/auth/login/login').then(m => m.Login)
     },
     {
         path: 'register',
+        canActivate: [guestGuard],
         loadComponent: () => import('./features/auth/register/register').then(m => m.Register)
     },
     {
         path: 'dashboard',
+        canActivate: [authGuard],
         component: DashboardShell,
         children: [
             { path: '',         loadComponent: () => import('./features/dashboard/home/dashboard-home').then(m => m.DashboardHome) },

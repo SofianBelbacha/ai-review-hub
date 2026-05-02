@@ -34,11 +34,11 @@ export class Login implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.googleAuth.load().then(() => {
-      this.googleAuth.initialize(
-        environment.googleClientId,
-        (response) => this.handleGoogleResponse(response)
+      this.googleAuth.renderButton(
+        'google-btn-login',
+        (response) => this.handleGoogleResponse(response),
+        'continue_with'
       );
-      this.googleAuth.renderButton('google-btn', 'continue_with');
       this.googleLoading.set(false);
 
     });

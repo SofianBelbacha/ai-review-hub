@@ -1,6 +1,7 @@
 ﻿using AiReviewHub.Application.Abstractions;
 using AiReviewHub.Domain.Abstractions;
 using AiReviewHub.Domain.Entities;
+using AiReviewHub.Domain.ValueObjects;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -36,21 +37,20 @@ namespace AiReviewHub.Application.Users.Commands.GoogleLogin
 
             if (!googleUser.EmailVerified)
                 throw new UnauthorizedAccessException("Google email is not verified");
-
             var now = _dateTimeProvider.UtcNow;
-            var email = googleUser.Email.ToLowerInvariant();
+            var email = Email.Create(googleUser.Email);
             var isNewUser = false;
 
             // Cherche un user existant par email
             var user = await _context.Users
                 .Include(u => u.RefreshTokens)
-                .FirstOrDefaultAsync(u => u.GoogleId == googleUser.GoogleId || u.Email.Value == email, cancellationToken);
+                .FirstOrDefaultAsync(u => u.GoogleId == googleUser.GoogleId || u.Email == email, cancellationToken);
 
             if (user is null)
             {
                 // Nouvel utilisateur via Google — pas de mot de passe
                 user = User.CreateWithGoogle(
-                    email,
+                    email.Value,
                     googleUser.FirstName,
                     googleUser.LastName,
                     googleUser.GoogleId,
@@ -70,9 +70,11 @@ namespace AiReviewHub.Application.Users.Commands.GoogleLogin
                 user.LinkGoogleAccount(googleUser.GoogleId, now);
             }
 
-            var session = await _tokenService.CreateSessionAsync(user, _dateTimeProvider.UtcNow, _context, cancellationToken);
+            // Service — logique métier pure
+            var session = _tokenService.PrepareSession(user, now);
 
-            await _context.SaveChangesAsync(cancellationToken);
+            _context.RefreshTokens.Add(session.RefreshTokenEntity);
+            await _context.SaveChangesAsync(cancellationToken); 
 
             return new GoogleLoginResult(
                 session.AccessToken,

@@ -1,4 +1,5 @@
 import { Injectable, NgZone, inject } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 export type GoogleButtonText =
   | 'signin_with'
@@ -10,6 +11,7 @@ export type GoogleButtonText =
 export class GoogleAuthService {
   private readonly zone = inject(NgZone);
   private initialized  = false;  
+  private activeCallback?: (response: google.accounts.id.CredentialResponse) => void;
 
   load(): Promise<void> {
     return new Promise(resolve => {
@@ -29,28 +31,38 @@ export class GoogleAuthService {
     });
   }
 
-  initialize(clientId: string, callback: (response: google.accounts.id.CredentialResponse) => void): void {
-    if (this.initialized) {
-      google.accounts.id.initialize({
-        client_id: clientId,
-        callback: (response) => this.zone.run(() => callback(response)),
-        auto_select: false,
-        cancel_on_tap_outside: true,
-      });
-      return;
-    }
+  private ensureInitialized(): void {
+    if (this.initialized) return;
+
     google.accounts.id.initialize({
-      client_id: clientId,
-      callback: (response) => this.zone.run(() => callback(response)),
+      client_id: environment.googleClientId,
+      // Le callback dispatch vers le callback actif
+      callback: (response) => {
+        this.zone.run(() => this.activeCallback?.(response));
+      },
       auto_select: false,
       cancel_on_tap_outside: true,
     });
+
     this.initialized = true;
   }
 
-  renderButton(elementId: string, text: GoogleButtonText = 'continue_with'): void {
+  // ─── Rendu du bouton avec callback spécifique ─────────────
+  renderButton(
+    elementId: string,
+    callback: (response: google.accounts.id.CredentialResponse) => void,
+    text: GoogleButtonText = 'continue_with'
+  ): void {
+    // Enregistre le callback actif pour ce bouton
+    this.activeCallback = callback;
+
+    this.ensureInitialized();
+
     const el = document.getElementById(elementId);
-    if (!el) return;
+    if (!el) {
+      console.warn(`[GoogleAuth] Element #${elementId} not found`);
+      return;
+    }
 
     google.accounts.id.renderButton(el, {
       type: 'standard',
@@ -59,13 +71,13 @@ export class GoogleAuthService {
       text,
       size: 'large',
       logo_alignment: 'left',
-      width: '100%',
     });
   }
-
   // ─── Reset au logout ──────────────────────────────────────
   reset(): void {
     this.initialized = false;
+    this.activeCallback = undefined;
+
     if (typeof google !== 'undefined') {
       google.accounts.id.cancel();
     }

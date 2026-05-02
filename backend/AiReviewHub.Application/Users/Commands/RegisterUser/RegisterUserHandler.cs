@@ -56,13 +56,13 @@ namespace AiReviewHub.Application.Users.Commands.RegisterUser
                 _dateTimeProvider.UtcNow
             );
 
+            // Service — logique métier pure
+            var session = _tokenService.PrepareSession(user, _dateTimeProvider.UtcNow);
 
             _context.Users.Add(user);
+            _context.RefreshTokens.Add(session.RefreshTokenEntity);
+            await _context.SaveChangesAsync(cancellationToken); 
 
-            // Délègue la création de session à ITokenService
-            var session = await _tokenService.CreateSessionAsync(user, _dateTimeProvider.UtcNow, _context, cancellationToken);
-
-            await _context.SaveChangesAsync(cancellationToken);
 
             return new RegisterUserResult(
                 user.Id,

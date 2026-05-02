@@ -14,12 +14,15 @@ namespace AiReviewHub.Application.Users.Commands.GenerateRefreshToken
         private readonly IAppDbContext _context;
         private readonly IJwtTokenGenerator _jwt;
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly ITokenService _tokenService;
 
-        public RefreshTokenHandler(IAppDbContext context, IJwtTokenGenerator jwt, IDateTimeProvider dateTimeProvider)
+
+        public RefreshTokenHandler(IAppDbContext context, IJwtTokenGenerator jwt, IDateTimeProvider dateTimeProvider, ITokenService tokenService)
         {
             _context = context;
             _jwt = jwt;
             _dateTimeProvider = dateTimeProvider;
+            _tokenService = tokenService;
         }
 
         public async Task<RefreshTokenResult> Handle(
@@ -52,29 +55,15 @@ namespace AiReviewHub.Application.Users.Commands.GenerateRefreshToken
             if (existingToken.IsExpired)
                 throw new UnauthorizedAccessException("Refresh token has expired");
 
-            // Génère de nouveaux tokens
-            var tokens = _jwt.GenerateTokens(user.Id, user.Email.Value);
+            var session = _tokenService.PrepareSession(user, now);
 
-            // Révoque l'ancien
-            existingToken.Revoke(now, tokens.RawRefreshToken);
+            // Handler orchestre tout
+            existingToken.Revoke(now, session.RawRefreshToken);
 
-            // Limite de sessions — révoque le plus ancien si nécessaire
-            var activeTokens = user.RefreshTokens
-                .Where(t => t.IsActive)
-                .OrderBy(t => t.CreatedAt)
-                .ToList();
-
-            if (activeTokens.Count >= 5)
-                activeTokens.First().Revoke(now);
-
-            // Sauvegarde uniquement les révocations
+            _context.RefreshTokens.Add(session.RefreshTokenEntity);
             await _context.SaveChangesAsync(cancellationToken);
 
-            // Insère le nouveau token dans un SaveChanges séparé
-            _context.RefreshTokens.Add(tokens.RefreshToken);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            // Nettoyage des anciens tokens — requête directe
+            // Nettoyage séparé
             await _context.RefreshTokens
                 .Where(t =>
                     t.UserId == user.Id &&
@@ -82,7 +71,8 @@ namespace AiReviewHub.Application.Users.Commands.GenerateRefreshToken
                     t.RevokedAt < now.AddDays(-30))
                 .ExecuteDeleteAsync(cancellationToken);
 
-            return new RefreshTokenResult(tokens.AccessToken, tokens.RawRefreshToken);
+            return new RefreshTokenResult(session.AccessToken, session.RawRefreshToken);
+
         }
     }
 }
