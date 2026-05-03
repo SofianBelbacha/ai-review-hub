@@ -159,11 +159,11 @@
 
       <!-- Profil utilisateur -->
       <div class="sidebar__user" [class.sidebar__user--collapsed]="sidebarCollapsed()">
-        <div class="sidebar__user-avatar" aria-hidden="true">JD</div>
+        <div class="sidebar__user-avatar" aria-hidden="true">{{ initials()}}</div>
         @if (!sidebarCollapsed()) {
           <div class="sidebar__user-info">
-            <span class="sidebar__user-name">Jean Dupont</span>
-            <span class="sidebar__user-email">jean&#64;exemple.com</span>
+            <span class="sidebar__user-name">{{ fullName() }}</span>
+            <span class="sidebar__user-email">{{ profile()?.email }}</span>
           </div>
           <button
             class="sidebar__user-logout"

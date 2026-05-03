@@ -5,6 +5,8 @@ import { Observable, BehaviorSubject, throwError, filter, take, switchMap, of } 
 import { tap, catchError, finalize } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { TokenStorageService } from './token-storage.service';
+import { UserService } from './user.service';
+
 
 export interface AuthTokens {
   accessToken: string;
@@ -21,7 +23,7 @@ export class AuthService {
   private readonly rawHttp = new HttpClient(inject(HttpBackend));
   private readonly router  = inject(Router);
   private readonly storage = inject(TokenStorageService);
-
+  private readonly userService = inject(UserService);
   private readonly API = environment.apiUrl;
 
   // ─── Signal public ────────────────────────────────────────
@@ -94,6 +96,7 @@ export class AuthService {
   // ─── Session ──────────────────────────────────────────────
   saveTokens(tokens: AuthTokens): void {
     this.storage.saveAccessToken(tokens.accessToken);
+    this.userService.refresh(); // ← décode le JWT et met à jour le profil
     this.isAuthenticated.set(true);
   }
 
@@ -104,6 +107,7 @@ export class AuthService {
   logout(revokeOnServer = true): void {
     const completeLogout = () => {
       this.storage.clearAll();
+      this.userService.clear(); // ← efface le profil
       this.isAuthenticated.set(false);
       this.isRefreshing = false;
       this.refreshSubject.next(null);

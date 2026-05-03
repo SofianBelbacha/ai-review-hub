@@ -11,47 +11,41 @@ using System.Text;
 
 namespace AiReviewHub.Infrastructure.Services
 {
-    public class JwtTokenGenerator : IJwtTokenGenerator
+    public class JwtTokenGenerator(IConfiguration configuration) : IJwtTokenGenerator
     {
-        private readonly IConfiguration _configuration;
-        private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IConfiguration _configuration = configuration;
 
-        public JwtTokenGenerator(IConfiguration configuration, IDateTimeProvider dateTimeProvider)
+        public TokenResult GenerateTokens(Guid userId, string email, string firstName, string lastName, string plan, DateTime now)
         {
-            _configuration = configuration;
-            _dateTimeProvider = dateTimeProvider;
-        }
-
-        public TokenResult GenerateTokens(Guid userId, string email)
-        {
-            var accessToken = GenerateAccessToken(userId, email);
-            var (refreshTokenEntity, rawToken) = RefreshToken.Create(userId, _dateTimeProvider.UtcNow);
+            var accessToken = GenerateAccessToken(userId, email, firstName, lastName, plan, now);
+            var (refreshTokenEntity, rawToken) = RefreshToken.Create(userId, now);
 
             return new TokenResult(accessToken, refreshTokenEntity, rawToken);
         }
 
-        private string GenerateAccessToken(Guid userId, string email)
+        private string GenerateAccessToken(Guid userId, string email, string firstName, string lastName, string plan, DateTime now)
         {
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)
             );
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expirationHours = _configuration.GetValue<int>("Jwt:ExpirationHours", 2);
 
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-                new Claim(ClaimTypes.Email, email)
+                new Claim(ClaimTypes.Email, email),
+                new Claim("firstName", firstName),
+                new Claim("lastName", lastName),
+                new Claim("plan", plan),
             };
-
-            var expirationHours = _configuration.GetValue<int>("Jwt:ExpirationHours", 2);
-
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: _dateTimeProvider.UtcNow.AddHours(expirationHours),
+                expires: now.AddHours(expirationHours),
                 signingCredentials: creds
             );
 

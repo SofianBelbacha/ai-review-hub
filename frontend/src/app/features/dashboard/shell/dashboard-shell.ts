@@ -2,6 +2,7 @@ import { Component, HostListener, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service';
  
 interface NavItem {
   label: string;
@@ -19,6 +20,12 @@ interface NavItem {
 export class DashboardShell {
   
   private readonly auth = inject(AuthService);
+  private readonly userService = inject(UserService);
+
+  readonly profile  = this.userService.profile;
+  readonly fullName = this.userService.fullName;
+  readonly initials = this.userService.initials;
+
 
   sidebarCollapsed = signal(false);
   mobileMenuOpen   = signal(false);

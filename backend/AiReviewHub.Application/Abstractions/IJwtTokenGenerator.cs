@@ -9,6 +9,6 @@ namespace AiReviewHub.Application.Abstractions
 
     public interface IJwtTokenGenerator
     {
-        TokenResult GenerateTokens(Guid userId, string email);
+        TokenResult GenerateTokens(Guid userId, string email, string firstName, string lastName, string plan, DateTime now);
     }
 }

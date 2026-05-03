@@ -45,12 +45,23 @@ export class UserService {
 
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
+
+      // Claims .NET — noms longs pour NameIdentifier et Email
+      const id = payload[
+        'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
+      ] ?? payload.sub ?? '';
+
+      const email = payload[
+        'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'
+      ] ?? payload.email ?? '';
+
+      // Claims custom — noms courts directs
       return {
-        id:        payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ?? payload.sub,
-        email:     payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']   ?? payload.email,
-        firstName: payload.firstName  ?? '',
-        lastName:  payload.lastName   ?? '',
-        plan:      payload.plan       ?? 'Free',
+        id,
+        email,
+        firstName: payload['firstName'] ?? '',
+        lastName:  payload['lastName']  ?? '',
+        plan:      payload['plan']      ?? 'Free',
       };
     } catch {
       return null;

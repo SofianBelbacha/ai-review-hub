@@ -28,7 +28,7 @@ namespace AiReviewHub.Infrastructure.Services
                 user.RevokeOldestActiveSession(now);
 
             // Génère les tokens
-            var tokens = _jwt.GenerateTokens(user.Id, user.Email.Value);
+            var tokens = _jwt.GenerateTokens(user.Id, user.Email.Value, user.FirstName, user.LastName, user.Plan.ToString(), now);
 
             return new SessionResult(
                 tokens.AccessToken,
