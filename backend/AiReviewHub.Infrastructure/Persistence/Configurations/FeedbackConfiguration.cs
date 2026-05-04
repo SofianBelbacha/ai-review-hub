@@ -39,6 +39,14 @@ namespace AiReviewHub.Infrastructure.Persistence.Configurations
             builder.Property(f => f.AiSummary)
                 .HasColumnType("text");
 
+            builder.Property(f => f.AiAnalysisStatus)
+                .HasConversion<string>()
+                .HasMaxLength(20)
+                .IsRequired();
+
+            builder.Property(f => f.AiAnalysisError)
+                .HasMaxLength(500);
+
             builder.Property(f => f.CreatedAt)
                 .IsRequired();
 

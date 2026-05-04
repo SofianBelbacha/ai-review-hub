@@ -34,6 +34,9 @@ namespace AiReviewHub.Infrastructure
             
             services.AddScoped<IGoogleTokenValidator, GoogleTokenValidator>();
 
+            services.AddScoped<IAiAnalysisService, AiAnalysisService>();
+            services.AddScoped<FeedbackAnalysisJob>();
+
 
             services.AddHangfire(config => config
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
@@ -45,7 +48,12 @@ namespace AiReviewHub.Infrastructure
                         configuration.GetConnectionString("DefaultConnection"));
                 }));
 
-            services.AddHangfireServer();
+            services.AddHangfireServer(options =>
+            {
+                options.WorkerCount = 2;  // 2 workers parallèles
+                options.Queues = ["default"];
+            });
+
             services.AddScoped<RefreshTokenCleanupJob>();
 
             return services;

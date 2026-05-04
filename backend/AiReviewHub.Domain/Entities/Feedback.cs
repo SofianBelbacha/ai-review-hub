@@ -26,6 +26,10 @@ namespace AiReviewHub.Domain.Entities
         public Guid ProjectId { get; private set; }
         public Project Project { get; private set; } = null!;
 
+        public AiAnalysisStatus AiAnalysisStatus { get; private set; }
+        public string? AiAnalysisError { get; private set; }
+
+
         private Feedback() { }
 
         public static Feedback Create(string content, Guid projectId, DateTime now)
@@ -40,13 +44,28 @@ namespace AiReviewHub.Domain.Entities
                 Category = FeedbackCategory.Uncategorized,
                 Priority = FeedbackPriority.Normal,
                 Status = FeedbackStatus.Todo,
+                AiAnalysisStatus = AiAnalysisStatus.Pending, // ← toujours Pending à la création
                 AiSummary = string.Empty,
                 ProjectId = projectId,
                 CreatedAt = DateTime.Now
             };
         }
 
-        public void EnrichWithAi(FeedbackCategory category, FeedbackPriority priority, string summary, IDateTimeProvider dateTimeProvider)
+        public void MarkAsProcessing(DateTime now)
+        {
+            AiAnalysisStatus = AiAnalysisStatus.Processing;
+            UpdatedAt = now;
+        }
+
+        public void MarkAsFailed(string error, DateTime now)
+        {
+            AiAnalysisStatus = AiAnalysisStatus.Failed;
+            AiAnalysisError = error;
+            UpdatedAt = now;
+        }
+
+
+        public void EnrichWithAi(FeedbackCategory category, FeedbackPriority priority, string summary, DateTime now)
         {
             if (string.IsNullOrWhiteSpace(summary))
                 throw new ArgumentException("AI summary cannot be empty");
@@ -54,7 +73,9 @@ namespace AiReviewHub.Domain.Entities
             Category = category;
             Priority = priority;
             AiSummary = summary.Trim();
-            UpdatedAt = dateTimeProvider.UtcNow;
+            AiAnalysisStatus = AiAnalysisStatus.Completed; // ← marque comme complété
+            AiAnalysisError = null;
+            UpdatedAt = now;
         }
 
         public void UpdateStatus(FeedbackStatus newStatus, DateTime now)

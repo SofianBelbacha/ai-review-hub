@@ -18,5 +18,6 @@ export interface RecentFeedback {
   category: string;
   priority: string;
   status: string;
+  aiAnalysisStatus: 'Pending' | 'Processing' | 'Completed' | 'Failed';
   createdAt: string;
 }

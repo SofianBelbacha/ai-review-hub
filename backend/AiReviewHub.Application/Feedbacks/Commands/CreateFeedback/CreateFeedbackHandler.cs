@@ -4,6 +4,7 @@ using AiReviewHub.Domain.Entities;
 using AiReviewHub.Domain.Exceptions;
 using AutoMapper;
 using MediatR;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,14 +19,16 @@ namespace AiReviewHub.Application.Feedbacks.Commands.CreateFeedback
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly ICurrentUserService _currentUser;
         private readonly IMapper _mapper;
+        private readonly IBackgroundJobClient _backgroundJobs;
 
 
-        public CreateFeedbackHandler(IAppDbContext context, IDateTimeProvider dateTimeProvider, ICurrentUserService currentUser,IMapper mapper)
+        public CreateFeedbackHandler(IAppDbContext context, IDateTimeProvider dateTimeProvider, ICurrentUserService currentUser,IMapper mapper, IBackgroundJobClient backgroundJobs)
         {
             _context = context;
             _dateTimeProvider = dateTimeProvider;
             _currentUser = currentUser;
             _mapper = mapper;
+            _backgroundJobs = backgroundJobs;
         }
 
         public async Task<CreateFeedbackResult> Handle(CreateFeedbackCommand request, CancellationToken cancellationToken)

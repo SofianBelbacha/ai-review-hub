@@ -81,7 +81,10 @@ app.UseCors(app.Environment.IsDevelopment() ? "Development" : "Production");
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.UseHangfireDashboard("/hangfire");
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        Authorization = [] // pas d'auth en dev
+    });
 }
 
 //app.UseHttpsRedirection();
