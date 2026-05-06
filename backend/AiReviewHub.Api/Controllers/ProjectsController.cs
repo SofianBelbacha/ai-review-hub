@@ -1,4 +1,6 @@
 ﻿using AiReviewHub.Application.Projects.Commands.CreateProject;
+using AiReviewHub.Application.Projects.Commands.DeactivateProject;
+using AiReviewHub.Application.Projects.Commands.RegenerateProjectToken;
 using AiReviewHub.Application.Projects.Queries.GetProjectsByUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -34,6 +36,26 @@ namespace AiReviewHub.Api.Controllers
                 cancellationToken);
 
             return Ok(result);
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Delete(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            await _mediator.Send(
+                new DeactivateProjectCommand(id), cancellationToken);
+            return NoContent();
+        }
+
+        [HttpPost("{id:guid}/regenerate-token")]
+        public async Task<IActionResult> RegenerateToken(
+            Guid id,
+            CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(
+                new RegenerateProjectTokenCommand(id), cancellationToken);
+            return Ok(new { publicToken = result.PublicToken });
         }
     }
     public record CreateProjectRequest(string Name, string Description);

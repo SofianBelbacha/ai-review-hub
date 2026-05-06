@@ -26,12 +26,13 @@ namespace AiReviewHub.Api.Controllers
             [FromQuery] FeedbackStatus? status,
             [FromQuery] FeedbackCategory? category,
             [FromQuery] FeedbackPriority? priority,
+            [FromQuery] string? search,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 20,
             CancellationToken cancellationToken = default)
         {
             var result = await _mediator.Send(
-                new GetFeedbacksByProjectQuery(projectId, status, category, priority, page, pageSize),
+                new GetFeedbacksByProjectQuery(projectId, status, category, priority, search, page, pageSize),
                 cancellationToken);
 
             return Ok(result);

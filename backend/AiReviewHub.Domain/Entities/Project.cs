@@ -30,6 +30,8 @@ namespace AiReviewHub.Domain.Entities
             if (userId == Guid.Empty)
                 throw new ArgumentException("UserId cannot be empty");
 
+            now = DateTime.SpecifyKind(now, DateTimeKind.Utc);
+
             return new Project
             {
                 Id = Guid.NewGuid(),
@@ -38,7 +40,8 @@ namespace AiReviewHub.Domain.Entities
                 PublicToken = GenerateToken(),
                 IsActive = true,
                 UserId = userId,
-                CreatedAt = DateTime.Now
+                CreatedAt = now,
+                UpdatedAt = now
             };
         }
 
