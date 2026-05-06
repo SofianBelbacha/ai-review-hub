@@ -1,1 +1,202 @@
-<p>feedbacks works!</p>
+<!-- feedbacks.html -->
+<div class="feedbacks">
+
+  <!-- ── En-tête ──────────────────────────────────────────── -->
+  <header class="feedbacks__header">
+    <div>
+      <h1 class="feedbacks__title">Feedbacks</h1>
+      <p class="feedbacks__subtitle">
+        {{ totalCount() }} feedback{{ totalCount() > 1 ? 's' : '' }} au total
+      </p>
+    </div>
+  </header>
+
+  <!-- ── Filtres ───────────────────────────────────────────── -->
+  <div class="feedbacks__filters">
+
+    <!-- Recherche -->
+    <div class="filter-search">
+      <svg class="filter-search__icon" viewBox="0 0 20 20" fill="none"
+           stroke="currentColor" stroke-width="1.5"
+           stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="8.5" cy="8.5" r="5.5"/>
+        <line x1="13" y1="13" x2="18" y2="18"/>
+      </svg>
+      <input
+        class="filter-search__input"
+        type="search"
+        placeholder="Rechercher un feedback…"
+        [value]="searchValue()"
+        (input)="onSearch($any($event.target).value)">
+    </div>
+
+    <!-- Catégorie -->
+    <select
+      class="filter-select"
+      [value]="categoryFilter()"
+      (change)="onCategoryChange($any($event.target).value)">
+      <option value="">Toutes les catégories</option>
+      @for (cat of categories; track cat) {
+        <option [value]="cat">{{ getCategoryFilterLabel(cat) }}</option>
+      }
+    </select>
+
+    <!-- Priorité -->
+    <select
+      class="filter-select"
+      [value]="priorityFilter()"
+      (change)="onPriorityChange($any($event.target).value)">
+      <option value="">Toutes les priorités</option>
+      @for (pri of priorities; track pri) {
+        <option [value]="pri">{{ getPriorityLabel(pri) }}</option>
+      }
+    </select>
+
+    <!-- Reset -->
+    @if (hasActiveFilters()) {
+      <button class="filter-reset" (click)="clearFilters()">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="2" y1="2" x2="14" y2="14"/>
+          <line x1="14" y1="2" x2="2" y2="14"/>
+        </svg>
+        Réinitialiser
+      </button>
+    }
+
+  </div>
+
+  <!-- ── Loading ───────────────────────────────────────────── -->
+  @if (loading()) {
+    <div class="feedbacks__loading">
+      @for (col of columns; track col.status) {
+        <div class="kanban-skeleton">
+          <div class="kanban-skeleton__header"></div>
+          @for (i of [1,2,3]; track i) {
+            <div class="kanban-skeleton__card"></div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── Erreur ─────────────────────────────────────────────── -->
+  @if (error()) {
+    <div class="feedbacks__error">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor"
+           stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="10" cy="10" r="8"/>
+        <line x1="10" y1="6" x2="10" y2="10.5"/>
+        <circle cx="10" cy="14" r="0.5" fill="currentColor"/>
+      </svg>
+      {{ error() }}
+      <button class="feedbacks__error-retry" (click)="load()">Réessayer</button>
+    </div>
+  }
+
+  <!-- ── Kanban ─────────────────────────────────────────────── -->
+  @if (!loading() && !error()) {
+    <div class="kanban">
+
+      @for (col of columns; track col.status) {
+        <div
+          class="kanban__col"
+          [class.kanban__col--dragover]="dragging() && dragging()!.status !== col.status"
+          (dragover)="onDragOver($event)"
+          (drop)="onDrop(col.status)">
+
+          <!-- Header colonne -->
+          <div class="kanban__col-header" [attr.data-color]="col.color">
+            <div class="kanban__col-title">
+              <span class="kanban__col-dot" [attr.data-color]="col.color"></span>
+              {{ col.label }}
+            </div>
+            <span class="kanban__col-count">
+              {{ getColumnFeedbacks(col.status).length }}
+            </span>
+          </div>
+
+          <!-- Cards -->
+          <div class="kanban__cards">
+
+            @if (getColumnFeedbacks(col.status).length === 0) {
+              <div class="kanban__empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="3"/>
+                  <line x1="9" y1="12" x2="15" y2="12"/>
+                </svg>
+                Aucun feedback
+              </div>
+            }
+
+            @for (fb of getColumnFeedbacks(col.status); track trackById($index, fb)) {
+              <article
+                class="fb-card"
+                [class.fb-card--dragging]="dragging()?.id === fb.id"
+                [class.fb-card--done]="fb.status === 'Done'"
+                [attr.data-priority]="fb.priority"
+                draggable="true"
+                (dragstart)="onDragStart(fb)"
+                (dragend)="onDragEnd()">
+
+                <!-- Badge IA -->
+                @if (fb.aiAnalysisStatus !== 'Completed') {
+                  <div class="fb-card__ai">
+                    @switch (fb.aiAnalysisStatus) {
+                      @case ('Pending') {
+                        <span class="ai-badge ai-badge--pending">
+                          <span class="ai-badge__dot"></span>
+                          En attente
+                        </span>
+                      }
+                      @case ('Processing') {
+                        <span class="ai-badge ai-badge--processing">
+                          <span class="ai-badge__spinner"></span>
+                          Analyse IA…
+                        </span>
+                      }
+                      @case ('Failed') {
+                        <span class="ai-badge ai-badge--failed">
+                          ⚠️ Échec IA
+                        </span>
+                      }
+                      @default { }
+                    }
+                  </div>
+                }
+
+                <!-- Contenu -->
+                <p class="fb-card__summary">
+                  {{ fb.aiSummary || fb.content }}
+                </p>
+
+                <!-- Contenu original si résumé IA disponible -->
+                @if (fb.aiSummary && fb.aiAnalysisStatus === 'Completed') {
+                  <p class="fb-card__original">{{ fb.content }}</p>
+                }
+
+                <!-- Meta -->
+                <div class="fb-card__meta">
+                  <span class="fb-card__category">
+                    {{ getCategoryLabel(fb.category) }}
+                  </span>
+                  <span class="fb-card__priority" [attr.data-priority]="fb.priority">
+                    {{ fb.priority }}
+                  </span>
+                  <span class="fb-card__date">
+                    {{ fb.createdAt | date:'dd/MM' }}
+                  </span>
+                </div>
+
+              </article>
+            }
+
+          </div>
+        </div>
+      }
+
+    </div>
+  }
+
+</div>

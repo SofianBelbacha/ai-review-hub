@@ -1,0 +1,38 @@
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+import { Feedback, FeedbackFilters, FeedbackStatus, PagedResult } from './feedbacks.types';
+
+@Injectable({ providedIn: 'root' })
+export class FeedbacksService {
+  private readonly http = inject(HttpClient);
+  private readonly API  = environment.apiUrl;
+
+  getAll(projectId: string, filters: FeedbackFilters): Observable<PagedResult<Feedback>> {
+    let params = new HttpParams()
+      .set('page',     filters.page)
+      .set('pageSize', filters.pageSize);
+
+    if (filters.category) params = params.set('category', filters.category);
+    if (filters.priority) params = params.set('priority', filters.priority);
+    if (filters.search)   params = params.set('search',   filters.search);
+
+    return this.http.get<PagedResult<Feedback>>(
+      `${this.API}/projects/${projectId}/feedbacks`,
+      { params, withCredentials: true }
+    );
+  }
+
+  updateStatus(
+    projectId: string,
+    feedbackId: string,
+    newStatus: FeedbackStatus
+  ): Observable<void> {
+    return this.http.patch<void>(
+      `${this.API}/projects/${projectId}/feedbacks/${feedbackId}/status`,
+      { newStatus },
+      { withCredentials: true }
+    );
+  }
+}

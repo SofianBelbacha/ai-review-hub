@@ -12,6 +12,7 @@ namespace AiReviewHub.Application.Feedbacks.Queries.GetFeedbacksByProject
         FeedbackStatus? StatusFilter = null,
         FeedbackCategory? CategoryFilter = null,
         FeedbackPriority? PriorityFilter = null,
+        string? Search = null,
         int Page = 1,
         int PageSize = 20
     ) : IRequest<PagedResult<FeedbackDto>>;

@@ -22,6 +22,7 @@ services:
       - Jwt__Key=${JWT_KEY}
       - Google__ClientId=${GOOGLE_CLIENT_ID}
       - Google__ClientSecret=${GOOGLE_CLIENT_SECRET}
+      - OpenAI__ApiKey=${OPENAI_API_KEY}
     develop:
       watch:
         - action: sync

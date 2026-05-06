@@ -19,7 +19,7 @@ public class CreateFeedbackHandler : IRequestHandler<CreateFeedbackCommand, Crea
     private readonly IMapper _mapper;
     private readonly IBackgroundJobClient _backgroundJobs;
     private readonly ILogger<CreateFeedbackHandler> _logger;
-    private readonly IFeedbackAnalysisQueue _analysisQueue; // ← interface Application
+    private readonly IFeedbackAnalysisQueue _analysisQueue; // interface Application
 
 
     public CreateFeedbackHandler(

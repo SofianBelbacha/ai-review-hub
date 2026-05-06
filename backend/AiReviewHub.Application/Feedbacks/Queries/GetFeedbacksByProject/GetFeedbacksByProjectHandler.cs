@@ -43,6 +43,14 @@ namespace AiReviewHub.Application.Feedbacks.Queries.GetFeedbacksByProject
                 .AsNoTracking()
                 .Where(f => f.ProjectId == request.ProjectId);
 
+            if (!string.IsNullOrWhiteSpace(request.Search))
+            {
+                var search = request.Search.ToLowerInvariant();
+                query = query.Where(f =>
+                    f.Content.Value.ToLower().Contains(search) ||
+                    f.AiSummary.ToLower().Contains(search));
+            }
+
             if (request.StatusFilter.HasValue)
                 query = query.Where(f => f.Status == request.StatusFilter.Value);
 
