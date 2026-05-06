@@ -75,7 +75,18 @@ services:
       - aireviewhub-network
     volumes:
       - pgadmin-data:/var/lib/pgadmin
-
+  
+  widget:
+    image: nginx:alpine
+    profiles:
+      - dev
+      - prod
+    volumes:
+      - ./widget/dist:/usr/share/nginx/html:ro
+    ports:
+      - "3000:80"
+    networks:
+      - aireviewhub-network
 
 volumes:
   pgadmin-data:

@@ -41,7 +41,6 @@ builder.Services
         };
     });
 
-// Program.cs
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Development", policy =>
@@ -65,6 +64,22 @@ builder.Services.AddCors(options =>
 
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddCors(options =>
+{
+    // Policy existante pour l'app Angular
+    options.AddPolicy("Angular", policy =>
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials());
+
+    // Policy pour le widget — accepte TOUTES les origines
+    options.AddPolicy("Widget", policy =>
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .WithMethods("POST", "OPTIONS"));
+});
 
 var app = builder.Build();
 
@@ -97,6 +112,9 @@ RecurringJob.AddOrUpdate<RefreshTokenCleanupJob>(
     "cleanup-refresh-tokens",
     job => job.CleanupExpiredTokens(),
     Cron.Daily);
+
+// Dans le pipeline
+app.UseCors("Angular");
 
 app.UseAuthentication();
 
