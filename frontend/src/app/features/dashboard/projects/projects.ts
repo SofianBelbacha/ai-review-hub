@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { UserService } from '../../../core/services/user.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-projects',
@@ -13,21 +14,24 @@ import { CommonModule } from '@angular/common';
   styleUrl: './projects.scss',
 })
 export class Projects implements OnInit {
-  private readonly service     = inject(ProjectsService);
-  private readonly router      = inject(Router);
+  private readonly service = inject(ProjectsService);
+  private readonly router = inject(Router);
   private readonly userService = inject(UserService);
 
   // ─── State ────────────────────────────────────────────────
-  loading       = signal(true);
-  error         = signal('');
-  projects      = signal<Project[]>([]);
-  showModal     = signal(false);
-  creating      = signal(false);
-  createError   = signal('');
-  copiedToken   = signal<string | null>(null);
+  loading = signal(true);
+  error = signal('');
+  projects = signal<Project[]>([]);
+  showModal = signal(false);
+  creating = signal(false);
+  createError = signal('');
+  copiedToken = signal<string | null>(null);
+  showSnippetModal = signal(false);
+  snippetToCopy   = signal('');
+
 
   // ─── Formulaire création ──────────────────────────────────
-  newName        = signal('');
+  newName = signal('');
   newDescription = signal('');
 
   // ─── Computed ─────────────────────────────────────────────
@@ -36,8 +40,8 @@ export class Projects implements OnInit {
   readonly projectLimit = computed(() => {
     switch (this.plan()) {
       case 'Team': return Infinity;
-      case 'Pro':  return 10;
-      default:     return 1;
+      case 'Pro': return 10;
+      default: return 1;
     }
   });
 
@@ -79,6 +83,11 @@ export class Projects implements OnInit {
 
   closeModal(): void {
     this.showModal.set(false);
+  }
+
+  closeSnippetModal(): void {
+    this.showSnippetModal.set(false);
+    this.snippetToCopy.set('');
   }
 
   onCreate(): void {
@@ -127,13 +136,47 @@ export class Projects implements OnInit {
 
   // ─── Copier le token public ───────────────────────────────
   copyToken(project: Project): void {
-    const widgetUrl = `http://localhost:4200/${project.publicToken}`;
-    navigator.clipboard.writeText(widgetUrl).then(() => {
-      this.copiedToken.set(project.id);
-      setTimeout(() => this.copiedToken.set(null), 2000);
-    });
+    const snippet = `<script src="http://localhost:3000/widget.iife.js"></script>
+    <ai-review-hub
+      token="${project.publicToken}"
+      api-url="${environment.apiUrl}"
+      mode="floating">
+    </ai-review-hub>`;
+
+    this.writeToClipboard(snippet, project.id);
   }
 
+  private async writeToClipboard(text: string, projectId: string): Promise<void> {
+    try {
+      // API moderne — disponible sur tous les navigateurs récents en HTTPS
+      await navigator.clipboard.writeText(text);
+      this.onCopied(projectId);
+    } catch {
+      // Fallback — ClipboardItem avec permission explicite
+      try {
+        const item = new ClipboardItem({
+          'text/plain': new Blob([text], { type: 'text/plain' })
+        });
+        await navigator.clipboard.write([item]);
+        this.onCopied(projectId);
+      } catch {
+        // Dernier recours — affiche le snippet dans une alerte
+        // pour que l'utilisateur puisse le copier manuellement
+        this.showManualCopy(text);
+      }
+    }
+  }
+
+  private onCopied(projectId: string): void {
+    this.copiedToken.set(projectId);
+    setTimeout(() => this.copiedToken.set(null), 2000);
+  }
+
+  private showManualCopy(text: string): void {
+    // Ouvre une modal avec le snippet pour copie manuelle
+    this.snippetToCopy.set(text);
+    this.showSnippetModal.set(true);
+  }
   // ─── Helpers ──────────────────────────────────────────────
   getInitials(name: string): string {
     return name
@@ -157,3 +200,4 @@ export class Projects implements OnInit {
     return item.id;
   }
 }
+

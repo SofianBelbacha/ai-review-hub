@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Widget — AI Review Hub</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #F9FAFB;
+            color: #111827;
+            min-height: 100vh;
+        }
+
+        /* Fausse page client */
+        .fake-site {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .fake-site__nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #E5E7EB;
+            margin-bottom: 2rem;
+        }
+
+        .fake-site__logo {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #111827;
+        }
+
+        .fake-site__nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .fake-site__nav-links a {
+            color: #6B7280;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .fake-site__hero {
+            background: linear-gradient(135deg, #EFF6FF, #F5F3FF);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            border: 1px solid #BFDBFE;
+        }
+
+        .fake-site__hero h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .fake-site__hero p {
+            color: #6B7280;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .fake-site__content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .fake-card {
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #E5E7EB;
+            padding: 1.5rem;
+        }
+
+        .fake-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .fake-card p {
+            font-size: 0.875rem;
+            color: #6B7280;
+            line-height: 1.6;
+        }
+
+        /* Panel de test */
+        .test-panel {
+            background: white;
+            border: 2px dashed #3B82F6;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .test-panel h2 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #3B82F6;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .test-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .test-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid #E5E7EB;
+            background: white;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            color: #374151;
+        }
+
+        .test-btn:hover {
+            background: #F9FAFB;
+            border-color: #3B82F6;
+            color: #3B82F6;
+        }
+
+        .test-btn--active {
+            background: #EFF6FF;
+            border-color: #3B82F6;
+            color: #3B82F6;
+        }
+
+        .test-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .test-field label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .test-field input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            outline: none;
+            font-family: monospace;
+        }
+
+        .test-field input:focus {
+            border-color: #3B82F6;
+        }
+
+        .test-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            background: #F0FDF4;
+            color: #16A34A;
+            border: 1px solid #86EFAC;
+        }
+
+        .inline-container {
+            margin-top: 1.5rem;
+        }
+
+        .inline-container h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6B7280;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Événements reçus */
+        .events-log {
+            background: #111827;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #10B981;
+            min-height: 60px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .events-log__empty {
+            color: #6B7280;
+        }
+
+        .event-entry {
+            margin-bottom: 0.3rem;
+            opacity: 0;
+            animation: logIn 0.3s ease forwards;
+        }
+
+        @keyframes logIn {
+            from {
+                opacity: 0;
+                transform: translateX(-4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .event-entry .time {
+            color: #60A5FA;
+        }
+
+        .event-entry .key {
+            color: #F59E0B;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="fake-site">
+
+        <!-- Fausse nav -->
+        <nav class="fake-site__nav">
+            <span class="fake-site__logo">🛍️ MonShop</span>
+            <ul class="fake-site__nav-links">
+                <li><a href="#">Accueil</a></li>
+                <li><a href="#">Produits</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </nav>
+
+        <!-- Hero -->
+        <div class="fake-site__hero">
+            <h1>Site client de démonstration</h1>
+            <p>Cette page simule un site client où le widget AI Review Hub est intégré.</p>
+        </div>
+
+        <!-- Panel de test -->
+        <div class="test-panel">
+            <h2>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="1 4 1 10 7 10" />
+                    <path d="M15 11a6 6 0 0 1-6 1H1" />
+                    <path d="M7 1h8v5" />
+                </svg>
+                Panneau de test
+            </h2>
+
+            <div class="test-field">
+                <label>Token du projet (publicToken)</label>
+                <input type="text" id="token-input" placeholder="Colle ton publicToken ici" value="test-token-local">
+            </div>
+
+            <div class="test-field">
+                <label>URL de l'API backend</label>
+                <input type="text" id="api-input" value="http://localhost:5000/api">
+            </div>
+
+            <div class="test-controls">
+                <button class="test-btn test-btn--active" onclick="setMode('floating')">
+                    🔘 Flottant
+                </button>
+                <button class="test-btn" onclick="setMode('inline')">
+                    📋 Inline
+                </button>
+                <button class="test-btn" onclick="setMode('both')">
+                    🔀 Les deux
+                </button>
+                <button class="test-btn" onclick="setColor('#3B82F6')">🔵 Bleu</button>
+                <button class="test-btn" onclick="setColor('#8B5CF6')">🟣 Violet</button>
+                <button class="test-btn" onclick="setColor('#10B981')">🟢 Vert</button>
+                <button class="test-btn" onclick="setColor('#F43F5E')">🔴 Rouge</button>
+                <button class="test-btn" onclick="reloadWidget()">🔄 Recharger</button>
+            </div>
+
+            <div class="test-status" id="status">
+                ✅ Widget chargé — en attente d'interaction
+            </div>
+
+            <!-- Zone inline -->
+            <div class="inline-container" id="inline-container" style="display:none">
+                <h3>Mode inline</h3>
+                <div id="inline-slot"></div>
+            </div>
+
+            <!-- Log des événements -->
+            <div style="margin-top: 1rem;">
+                <div
+                    style="font-size:0.75rem; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem;">
+                    Événements reçus
+                </div>
+                <div class="events-log" id="events-log">
+                    <span class="events-log__empty">Aucun événement pour l'instant…</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Contenu factice -->
+        <div class="fake-site__content">
+            <div class="fake-card">
+                <h3>Produit A</h3>
+                <p>Description du produit A avec quelques détails pour rendre la page réaliste.</p>
+            </div>
+            <div class="fake-card">
+                <h3>Produit B</h3>
+                <p>Description du produit B avec quelques détails pour rendre la page réaliste.</p>
+            </div>
+            <div class="fake-card">
+                <h3>Produit C</h3>
+                <p>Description du produit C avec quelques détails pour rendre la page réaliste.</p>
+            </div>
+            <div class="fake-card">
+                <h3>Produit D</h3>
+                <p>Description du produit D avec quelques détails pour rendre la page réaliste.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ══════════════════════════════════════════════════
+     Widget AI Review Hub — version inline pour test
+     (sans le build Vite, on l'écrit directement ici)
+     ══════════════════════════════════════════════════ -->
+    <script>
+        // ─── Styles isolés dans le Shadow DOM ────────────────────
+        const WIDGET_STYLES = `
+  :host {
+    --arh-primary: #3B82F6;
+    --arh-primary-h: #2563EB;
+    --arh-success: #10B981;
+    --arh-error: #F43F5E;
+    --arh-bg: #ffffff;
+    --arh-text: #111827;
+    --arh-text-sub: #6B7280;
+    --arh-border: #E5E7EB;
+    --arh-radius: 12px;
+    --arh-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.08);
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    box-sizing: border-box;
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+
+  .trigger {
+    position: fixed; bottom: 24px; right: 24px; z-index: 999999;
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 20px;
+    background: var(--arh-primary); color: white;
+    border: none; border-radius: 50px; cursor: pointer;
+    font-size: 14px; font-weight: 600;
+    box-shadow: 0 4px 20px rgba(59,130,246,0.4);
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+  .trigger:hover { background: var(--arh-primary-h); transform: translateY(-2px); }
+  .trigger svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .trigger svg.icon-close { display: none; }
+  .trigger--open svg.icon-chat  { display: none; }
+  .trigger--open svg.icon-close { display: block; }
+
+  .panel {
+    position: fixed; bottom: 88px; right: 24px; z-index: 999998;
+    width: 360px; max-width: calc(100vw - 48px);
+    background: var(--arh-bg);
+    border-radius: var(--arh-radius);
+    box-shadow: var(--arh-shadow);
+    border: 1px solid var(--arh-border);
+    overflow: hidden;
+    transform-origin: bottom right;
+    transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .panel--hidden  { opacity: 0; transform: scale(0.85) translateY(12px); pointer-events: none; }
+  .panel--visible { opacity: 1; transform: scale(1) translateY(0); }
+
+  .inline {
+    width: 100%; background: var(--arh-bg);
+    border-radius: var(--arh-radius);
+    border: 1px solid var(--arh-border); overflow: hidden;
+  }
+
+  .panel__header {
+    padding: 16px 20px;
+    background: linear-gradient(135deg, var(--arh-primary), #6366F1);
+    color: white;
+  }
+  .panel__title   { font-size: 15px; font-weight: 700; margin: 0 0 2px; }
+  .panel__subtitle { font-size: 12px; opacity: 0.85; margin: 0; }
+
+  .form { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field__label {
+    font-size: 12px; font-weight: 600; color: var(--arh-text);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .field__textarea {
+    width: 100%; padding: 10px 12px;
+    border: 1.5px solid var(--arh-border); border-radius: 8px;
+    background: #F9FAFB; color: var(--arh-text);
+    font-size: 13px; font-family: inherit; line-height: 1.5;
+    resize: none; outline: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .field__textarea:focus { border-color: var(--arh-primary); background: white; }
+  .field__textarea::placeholder { color: #9CA3AF; }
+  .field__counter { font-size: 11px; color: var(--arh-text-sub); text-align: right; }
+  .field__counter--warn { color: var(--arh-error); }
+
+  .categories { display: flex; gap: 6px; flex-wrap: wrap; }
+  .category-btn {
+    padding: 5px 10px; border-radius: 20px;
+    border: 1.5px solid var(--arh-border);
+    background: transparent; color: var(--arh-text-sub);
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .category-btn:hover { border-color: var(--arh-primary); color: var(--arh-primary); }
+  .category-btn--active {
+    background: #EFF6FF; border-color: var(--arh-primary);
+    color: var(--arh-primary); font-weight: 600;
+  }
+
+  .submit-btn {
+    width: 100%; padding: 11px;
+    background: var(--arh-primary); color: white;
+    border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .submit-btn:hover:not(:disabled) { background: var(--arh-primary-h); transform: translateY(-1px); }
+  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white; border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-msg {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 12px;
+    background: #FFF1F2; border: 1px solid #FECDD3;
+    border-radius: 6px; color: #BE123C; font-size: 12px;
+  }
+  .error-msg svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  .success {
+    padding: 32px 20px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 12px; text-align: center;
+    animation: successIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes successIn { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+  .success__icon {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: #F0FDF4;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--arh-success);
+  }
+  .success__icon svg { width: 28px; height: 28px; }
+  .success__title { font-size: 16px; font-weight: 700; color: var(--arh-text); margin: 0; }
+  .success__desc  { font-size: 13px; color: var(--arh-text-sub); margin: 0; }
+  .success__again {
+    margin-top: 4px; padding: 8px 16px;
+    border-radius: 6px; border: 1.5px solid var(--arh-border);
+    background: transparent; color: var(--arh-text-sub);
+    font-size: 12px; cursor: pointer; transition: all 0.15s ease;
+  }
+  .success__again:hover { border-color: var(--arh-primary); color: var(--arh-primary); }
+
+  .panel__footer {
+    padding: 10px 20px; border-top: 1px solid var(--arh-border);
+    text-align: center; font-size: 11px; color: var(--arh-text-sub);
+  }
+  .panel__footer a { color: var(--arh-primary); text-decoration: none; font-weight: 500; }
+
+  @media (max-width: 480px) {
+    .panel {
+      bottom: 0; right: 0; left: 0; width: 100%; max-width: 100%;
+      border-radius: var(--arh-radius) var(--arh-radius) 0 0;
+      transform-origin: bottom center;
+    }
+    .trigger { bottom: 16px; right: 16px; }
+  }
+`;
+
+        const CATEGORIES = [
+            { value: 'Bug', label: '🐛 Bug' },
+            { value: 'FeatureRequest', label: '✨ Idée' },
+            { value: 'Question', label: '❓ Question' },
+            { value: 'Uncategorized', label: '💬 Autre' },
+        ];
+
+        const MAX_LENGTH = 2000;
+        const MIN_LENGTH = 10;
+
+        class AiReviewHubWidget extends HTMLElement {
+            static get observedAttributes() {
+                return ['token', 'api-url', 'mode', 'placeholder', 'title', 'primary-color'];
+            }
+
+            constructor() {
+                super();
+                this.state = { open: false, loading: false, success: false, error: '', content: '', category: '' };
+            }
+
+            connectedCallback() {
+                this._shadow = this.attachShadow({ mode: 'open' });
+                this._applyColors();
+                this._render();
+                this._attach();
+            }
+
+            attributeChangedCallback() {
+                if (this._shadow) { this._applyColors(); this._render(); this._attach(); }
+            }
+
+            get _token() { return this.getAttribute('token') || ''; }
+            get _apiUrl() { return this.getAttribute('api-url') || 'http://localhost:5000/api'; }
+            get _mode() { return this.getAttribute('mode') || 'floating'; }
+            get _placeholder() { return this.getAttribute('placeholder') || 'Décrivez votre retour, bug ou suggestion…'; }
+            get _title() { return this.getAttribute('title') || 'Votre avis compte'; }
+
+            _applyColors() {
+                const c = this.getAttribute('primary-color');
+                if (c) this.style.setProperty('--arh-primary', c);
+            }
+
+            _render() {
+                const mode = this._mode;
+                const isFloat = mode === 'floating' || mode === 'both';
+                const isInline = mode === 'inline' || mode === 'both';
+
+                this._shadow.innerHTML = `
+      <style>${WIDGET_STYLES}</style>
+      ${isFloat ? this._trigger() : ''}
+      ${isFloat ? `<div class="panel ${this.state.open ? 'panel--visible' : 'panel--hidden'}">
+        ${this._header()}${this._content()}${this._footer()}
+      </div>` : ''}
+      ${isInline ? `<div class="inline">${this._content()}${this._footer()}</div>` : ''}
+    `;
+            }
+
+            _trigger() {
+                return `<button class="trigger ${this.state.open ? 'trigger--open' : ''}" data-action="toggle">
+      <svg class="icon-chat" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6l-4 4V5z"/>
+      </svg>
+      <svg class="icon-close" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="4" y1="4" x2="16" y2="16"/><line x1="16" y1="4" x2="4" y2="16"/>
+      </svg>
+      ${this.state.open ? 'Fermer' : 'Feedback'}
+    </button>`;
+            }
+
+            _header() {
+                return `<div class="panel__header">
+      <p class="panel__title">${this._title}</p>
+      <p class="panel__subtitle">Aidez-nous à améliorer votre expérience</p>
+    </div>`;
+            }
+
+            _content() {
+                return this.state.success ? this._success() : this._form();
+            }
+
+            _form() {
+                const remaining = MAX_LENGTH - this.state.content.length;
+                const isValid = this.state.content.trim().length >= MIN_LENGTH;
+                return `<div class="form">
+      <div class="field">
+        <label class="field__label">Votre retour</label>
+        <textarea class="field__textarea" rows="4" maxlength="${MAX_LENGTH}"
+          placeholder="${this._placeholder}" data-action="input">${this.state.content}</textarea>
+        <span class="field__counter ${remaining < 100 ? 'field__counter--warn' : ''}">
+          ${remaining} caractères restants
+        </span>
+      </div>
+      <div class="field">
+        <label class="field__label">Catégorie</label>
+        <div class="categories">
+          ${CATEGORIES.map(c => `<button class="category-btn ${this.state.category === c.value ? 'category-btn--active' : ''}"
+            data-action="category" data-value="${c.value}">${c.label}</button>`).join('')}
+        </div>
+      </div>
+      ${this.state.error ? `<div class="error-msg">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="8" cy="8" r="7"/><line x1="8" y1="5" x2="8" y2="8.5"/>
+          <circle cx="8" cy="11" r="0.5" fill="currentColor"/>
+        </svg>${this.state.error}</div>` : ''}
+      <button class="submit-btn" data-action="submit" ${this.state.loading || !isValid ? 'disabled' : ''}>
+        ${this.state.loading
+                        ? `<span class="spinner"></span>Envoi…`
+                        : `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+               <line x1="3" y1="8" x2="13" y2="8"/><polyline points="9 4 13 8 9 12"/>
+             </svg>Envoyer`}
+      </button>
+    </div>`;
+            }
+
+            _success() {
+                return `<div class="success">
+      <div class="success__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h3 class="success__title">Merci pour votre retour !</h3>
+      <p class="success__desc">Notre équipe l'analysera et reviendra vers vous si nécessaire.</p>
+      <button class="success__again" data-action="reset">Envoyer un autre retour</button>
+    </div>`;
+            }
+
+            _footer() {
+                return `<div class="panel__footer">Propulsé par <a href="https://aireviewhub.com" target="_blank">AI Review Hub</a></div>`;
+            }
+
+            _attach() {
+                this._shadow.addEventListener('click', e => this._click(e));
+                this._shadow.addEventListener('input', e => this._input(e));
+            }
+
+            _click(e) {
+                const t = e.target.closest('[data-action]');
+                if (!t) return;
+                switch (t.dataset.action) {
+                    case 'toggle':
+                        this.state.open = !this.state.open;
+                        this._render(); this._attach();
+                        if (this.state.open) requestAnimationFrame(() => this._shadow.querySelector('textarea')?.focus());
+                        break;
+                    case 'category':
+                        this.state.category = this.state.category === t.dataset.value ? '' : t.dataset.value;
+                        this._render(); this._attach();
+                        break;
+                    case 'submit':
+                        this._submit();
+                        break;
+                    case 'reset':
+                        this.state = { ...this.state, success: false, error: '', content: '', category: '' };
+                        this._render(); this._attach();
+                        break;
+                }
+            }
+
+            _input(e) {
+                if (e.target.dataset.action === 'input') {
+                    this.state.content = e.target.value;
+                    const counter = this._shadow.querySelector('.field__counter');
+                    const btn = this._shadow.querySelector('.submit-btn');
+                    const rem = MAX_LENGTH - this.state.content.length;
+                    if (counter) {
+                        counter.textContent = `${rem} caractères restants`;
+                        counter.classList.toggle('field__counter--warn', rem < 100);
+                    }
+                    if (btn) btn.disabled = this.state.loading || this.state.content.trim().length < MIN_LENGTH;
+                }
+            }
+
+            async _submit() {
+                if (this.state.loading) return;
+                const content = this.state.content.trim();
+                if (content.length < MIN_LENGTH) {
+                    this.state.error = `Minimum ${MIN_LENGTH} caractères requis.`;
+                    this._render(); this._attach(); return;
+                }
+
+                this.state.loading = true; this.state.error = '';
+                this._render(); this._attach();
+
+                // Met à jour le statut dans le panneau de test
+                document.getElementById('status').innerHTML =
+                    '⏳ Envoi en cours vers <code>' + this._apiUrl + '</code>…';
+
+                try {
+                    const res = await fetch(`${this._apiUrl}/widget/feedback`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            content,
+                            projectToken: this._token,
+                            category: this.state.category || undefined,
+                            pageUrl: window.location.href,
+                            userAgent: navigator.userAgent,
+                        })
+                    });
+
+                    if (!res.ok) {
+                        const err = await res.json().catch(() => ({}));
+                        throw new Error(err.message || `HTTP ${res.status}`);
+                    }
+
+                    const data = await res.json();
+
+                    this.state.success = true; this.state.loading = false;
+
+                    // Log l'événement
+                    logEvent('arh:feedback-submitted', { id: data.id, content: content.slice(0, 40) + '…', category: this.state.category });
+
+                    document.getElementById('status').innerHTML =
+                        '✅ Feedback soumis avec succès — ID : <code>' + data.id + '</code>';
+
+                    this.dispatchEvent(new CustomEvent('arh:feedback-submitted', {
+                        bubbles: true, composed: true,
+                        detail: { id: data.id, content, category: this.state.category }
+                    }));
+
+                } catch (err) {
+                    this.state.loading = false;
+                    this.state.error = err.message.includes('Failed to fetch')
+                        ? 'Impossible de joindre le backend. Vérifiez que le serveur tourne.'
+                        : 'Erreur : ' + err.message;
+
+                    document.getElementById('status').innerHTML =
+                        '❌ Erreur : ' + err.message;
+
+                    logEvent('arh:feedback-error', { error: err.message });
+                }
+
+                this._render(); this._attach();
+            }
+        }
+
+        if (!customElements.get('ai-review-hub')) {
+            customElements.define('ai-review-hub', AiReviewHubWidget);
+        }
+
+        // ─── Fonctions du panneau de test ─────────────────────────
+        let currentMode = 'floating';
+        let currentColor = '#3B82F6';
+
+        function reloadWidget() {
+            const token = document.getElementById('token-input').value;
+            const apiUrl = document.getElementById('api-input').value;
+
+            // Supprime les anciens widgets
+            document.querySelectorAll('ai-review-hub').forEach(w => w.remove());
+
+            // Widget flottant
+            if (currentMode === 'floating' || currentMode === 'both') {
+                const w = document.createElement('ai-review-hub');
+                w.setAttribute('token', token);
+                w.setAttribute('api-url', apiUrl);
+                w.setAttribute('mode', 'floating');
+                w.setAttribute('primary-color', currentColor);
+                w.setAttribute('title', 'Votre avis nous intéresse');
+                document.body.appendChild(w);
+                w.addEventListener('arh:feedback-submitted', e => logEvent('arh:feedback-submitted', e.detail));
+            }
+
+            // Widget inline
+            const container = document.getElementById('inline-container');
+            const slot = document.getElementById('inline-slot');
+            slot.innerHTML = '';
+
+            if (currentMode === 'inline' || currentMode === 'both') {
+                container.style.display = 'block';
+                const w = document.createElement('ai-review-hub');
+                w.setAttribute('token', token);
+                w.setAttribute('api-url', apiUrl);
+                w.setAttribute('mode', 'inline');
+                w.setAttribute('primary-color', currentColor);
+                w.setAttribute('placeholder', 'Partagez votre avis sur cette page…');
+                slot.appendChild(w);
+                w.addEventListener('arh:feedback-submitted', e => logEvent('arh:feedback-submitted', e.detail));
+            } else {
+                container.style.display = 'none';
+            }
+
+            document.getElementById('status').innerHTML =
+                `✅ Widget rechargé — mode: <strong>${currentMode}</strong>, couleur: <span style="color:${currentColor}">■</span> ${currentColor}`;
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.test-btn').forEach(b => {
+                if (b.textContent.includes(mode === 'floating' ? 'Flottant' : mode === 'inline' ? 'Inline' : 'deux')) {
+                    b.classList.add('test-btn--active');
+                } else if (['Flottant', 'Inline', 'deux'].some(t => b.textContent.includes(t))) {
+                    b.classList.remove('test-btn--active');
+                }
+            });
+            reloadWidget();
+        }
+
+        function setColor(color) {
+            currentColor = color;
+            reloadWidget();
+        }
+
+        function logEvent(name, detail) {
+            const log = document.getElementById('events-log');
+            const empty = log.querySelector('.events-log__empty');
+            if (empty) empty.remove();
+
+            const now = new Date().toLocaleTimeString('fr-FR');
+            const entry = document.createElement('div');
+            entry.className = 'event-entry';
+            entry.innerHTML = `<span class="time">[${now}]</span> <span class="key">${name}</span> ${JSON.stringify(detail)}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Initialisation au chargement
+        window.addEventListener('DOMContentLoaded', () => reloadWidget());
+    </script>
+
+</body>
+
+</html>

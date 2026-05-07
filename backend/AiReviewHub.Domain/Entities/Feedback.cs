@@ -37,6 +37,8 @@ namespace AiReviewHub.Domain.Entities
             if (projectId == Guid.Empty)
                 throw new ArgumentException("ProjectId cannot be empty");
 
+            now = DateTime.SpecifyKind(now, DateTimeKind.Utc);
+
             return new Feedback
             {
                 Id = Guid.NewGuid(),
@@ -47,7 +49,7 @@ namespace AiReviewHub.Domain.Entities
                 AiAnalysisStatus = AiAnalysisStatus.Pending, // ← toujours Pending à la création
                 AiSummary = string.Empty,
                 ProjectId = projectId,
-                CreatedAt = DateTime.Now
+                CreatedAt = now
             };
         }
 
