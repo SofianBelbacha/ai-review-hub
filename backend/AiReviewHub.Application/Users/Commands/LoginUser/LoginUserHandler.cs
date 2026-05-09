@@ -15,16 +15,14 @@ namespace AiReviewHub.Application.Users.Commands.LoginUser
     {
         private readonly IAppDbContext _context;
         private readonly IPasswordHasher _passwordHasher;
-        private readonly IJwtTokenGenerator _jwt;
         IDateTimeProvider _dateTimeProvider;
         private readonly ITokenService _tokenService;
 
 
-        public LoginUserHandler(IAppDbContext context, IPasswordHasher passwordHasher, IJwtTokenGenerator jwt, IDateTimeProvider dateTimeProvider, ITokenService tokenService)
+        public LoginUserHandler(IAppDbContext context, IPasswordHasher passwordHasher, IDateTimeProvider dateTimeProvider, ITokenService tokenService)
         {
             _context = context;
             _passwordHasher = passwordHasher;
-            _jwt = jwt;
             _dateTimeProvider = dateTimeProvider;
             _tokenService = tokenService;
         }

@@ -43,9 +43,6 @@
 // ── Logo ──────────────────────────────────────────────────
 
 .navbar__logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
   color: var(--color-dark);
   text-decoration: none;
   flex-shrink: 0;
@@ -53,16 +50,8 @@
 }
 
 .navbar__logo-icon {
-  width: 28px;
-  height: 28px;
+  width: 50px;
 }
-
-.navbar__logo-text {
-  font-family: var(--font-medium);
-  font-size: 15px;
-  font-weight: 500;
-}
-
 
 // ── Nav links ─────────────────────────────────────────────
 

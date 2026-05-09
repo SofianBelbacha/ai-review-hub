@@ -37,6 +37,9 @@ namespace AiReviewHub.Domain.Entities
             if (projectId == Guid.Empty)
                 throw new ArgumentException("ProjectId cannot be empty");
 
+            if (string.IsNullOrWhiteSpace(content) || content.Length < 10)
+                throw new ArgumentException("Feedback content must be at least 10 characters.");
+
             now = DateTime.SpecifyKind(now, DateTimeKind.Utc);
 
             return new Feedback

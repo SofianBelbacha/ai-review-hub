@@ -17,7 +17,6 @@ public class CreateFeedbackHandler : IRequestHandler<CreateFeedbackCommand, Crea
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ICurrentUserService _currentUser;
     private readonly IMapper _mapper;
-    private readonly IBackgroundJobClient _backgroundJobs;
     private readonly ILogger<CreateFeedbackHandler> _logger;
     private readonly IFeedbackAnalysisQueue _analysisQueue; // interface Application
 
@@ -27,7 +26,6 @@ public class CreateFeedbackHandler : IRequestHandler<CreateFeedbackCommand, Crea
         IDateTimeProvider dateTimeProvider,
         ICurrentUserService currentUser,
         IMapper mapper,
-        IBackgroundJobClient backgroundJobs,
         ILogger<CreateFeedbackHandler> logger,
         IFeedbackAnalysisQueue analysisQueue)
     {
@@ -35,7 +33,6 @@ public class CreateFeedbackHandler : IRequestHandler<CreateFeedbackCommand, Crea
         _dateTimeProvider = dateTimeProvider;
         _currentUser = currentUser;
         _mapper = mapper;
-        _backgroundJobs = backgroundJobs;
         _logger = logger;
         _analysisQueue = analysisQueue;
     }

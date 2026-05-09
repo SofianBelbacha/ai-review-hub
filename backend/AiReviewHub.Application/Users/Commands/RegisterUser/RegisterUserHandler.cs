@@ -18,19 +18,12 @@ namespace AiReviewHub.Application.Users.Commands.RegisterUser
         private readonly IDateTimeProvider _dateTimeProvider;
         private readonly IPasswordHasher _passwordHasher;
         private readonly ITokenService _tokenService;
-        private readonly IJwtTokenGenerator _jwt;
-        private readonly IMapper _mapper;
 
-        public RegisterUserHandler(IAppDbContext context,
-            IDateTimeProvider dateTimeProvider,
-            IPasswordHasher passwordHasher,
-            IMapper mapper,  IJwtTokenGenerator jwt, ITokenService tokenService)
+        public RegisterUserHandler(IAppDbContext context, IDateTimeProvider dateTimeProvider, IPasswordHasher passwordHasher, ITokenService tokenService)
         {
             _context = context;
             _dateTimeProvider = dateTimeProvider;
             _passwordHasher = passwordHasher;
-            _mapper = mapper;
-            _jwt = jwt;
             _tokenService = tokenService;
         }
 
