@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, interval, switchMap, takeWhile, Subscription } from 'rxjs';
 import { FeedbacksService } from './feedbacks.service';
 import { Feedback, FeedbackCategory, FeedbackFilters, FeedbackPriority, FeedbackStatus } from './feedbacks.types';
+import { UserService } from '../../../core/services/user.service';
 
 @Component({
   selector: 'app-feedbacks',
@@ -17,6 +18,10 @@ export class Feedbacks implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly search$ = new Subject<string>();
   private pollSub?: Subscription;
+  private readonly userService = inject(UserService);
+  readonly isPro = computed(() =>
+    this.userService.profile()?.plan !== 'Free'
+  );
 
   // ─── State ────────────────────────────────────────────────
   loading = signal(true);
@@ -24,6 +29,7 @@ export class Feedbacks implements OnInit, OnDestroy {
   feedbacks = signal<Feedback[]>([]);
   totalCount = signal(0);
   dragging = signal<Feedback | null>(null);
+  exporting = signal(false);
 
   // ─── Filtres ──────────────────────────────────────────────
   searchValue = signal('');
@@ -245,5 +251,43 @@ export class Feedbacks implements OnInit, OnDestroy {
 
   trackById(_: number, item: Feedback): string {
     return item.id;
+  }
+
+  exportCsv(): void {
+    if (this.exporting()) return;
+    this.exporting.set(true);
+
+    const filters = {
+      category: this.categoryFilter() || undefined,
+      priority: this.priorityFilter() || undefined,
+      status: undefined, // export tout si pas de filtre statut
+    };
+
+    this.service.exportCsv(this.projectId, filters).subscribe({
+      next: (blob) => {
+        // Crée un lien de téléchargement temporaire
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const fileName = `feedbacks_${new Date().toISOString().slice(0, 10)}.csv`;
+
+        link.href = url;
+        link.download = fileName;
+        link.click();
+
+        // Nettoyage
+        URL.revokeObjectURL(url);
+        this.exporting.set(false);
+      },
+      error: (err) => {
+        this.exporting.set(false);
+
+        if (err.status === 403) {
+          this.error.set(
+            'L\'export CSV est disponible à partir du plan Pro.');
+        } else {
+          this.error.set('Erreur lors de l\'export. Réessayez.');
+        }
+      }
+    });
   }
 }

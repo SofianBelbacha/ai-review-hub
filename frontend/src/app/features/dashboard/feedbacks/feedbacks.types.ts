@@ -21,6 +21,7 @@ export interface FeedbackFilters {
     search: string;
     page: number;
     pageSize: number;
+    status?: FeedbackStatus;
 }
 
 export interface PagedResult<T> {

@@ -1,5 +1,6 @@
 ﻿using AiReviewHub.Application.Feedbacks.Commands.CreateFeedback;
 using AiReviewHub.Application.Feedbacks.Commands.UpdateFeedbackStatus;
+using AiReviewHub.Application.Feedbacks.Queries.ExportFeedbacksCsv;
 using AiReviewHub.Application.Feedbacks.Queries.GetFeedbacksByProject;
 using AiReviewHub.Domain.Enums;
 using MediatR;
@@ -58,6 +59,24 @@ namespace AiReviewHub.Api.Controllers
             await _mediator.Send(new UpdateFeedbackStatusCommand(feedbackId, projectId, request.NewStatus), cancellationToken);
 
             return NoContent();
+        }
+
+        [HttpGet("export")]
+        public async Task<IActionResult> Export(
+            Guid projectId,
+            [FromQuery] FeedbackStatus? status = null,
+            [FromQuery] FeedbackCategory? category = null,
+            [FromQuery] FeedbackPriority? priority = null,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _mediator.Send(
+                new ExportFeedbacksCsvQuery(projectId, status, category, priority),
+                cancellationToken);
+
+            return File(
+                result.Content,
+                "text/csv; charset=utf-8",
+                result.FileName);
         }
     }
 
