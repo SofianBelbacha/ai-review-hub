@@ -126,7 +126,7 @@ AiReviewHub/
 * [x] Dashboard
 * [ ] Billing Stripe
 * [ ] Notifications email
-* [ ] Export CSV
+* [x] Export CSV
 * [ ] Multi-language widget
 
 ---
