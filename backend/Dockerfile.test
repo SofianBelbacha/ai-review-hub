@@ -1,0 +1,22 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS test
+
+WORKDIR /app
+
+# Copie tous les projets
+COPY ["AiReviewHub.Api/AiReviewHub.Api.csproj",                 "AiReviewHub.Api/"]
+COPY ["AiReviewHub.Application/AiReviewHub.Application.csproj", "AiReviewHub.Application/"]
+COPY ["AiReviewHub.Domain/AiReviewHub.Domain.csproj",           "AiReviewHub.Domain/"]
+COPY ["AiReviewHub.Infrastructure/AiReviewHub.Infrastructure.csproj", "AiReviewHub.Infrastructure/"]
+COPY ["AiReviewHub.Tests/AiReviewHub.Tests.csproj",             "AiReviewHub.Tests/"]
+
+RUN --mount=type=cache,target=/root/.nuget/packages \
+    dotnet restore "AiReviewHub.Tests/AiReviewHub.Tests.csproj"
+
+COPY . .
+
+# Lance les tests au démarrage du conteneur
+CMD ["dotnet", "test", "AiReviewHub.Tests/AiReviewHub.Tests.csproj", \
+     "--no-restore", \
+     "--verbosity", "normal", \
+     "--logger", "trx;LogFileName=/app/TestResults/results.trx", \
+     "--collect:XPlat Code Coverage"]

@@ -1,0 +1,40 @@
+version: 2
+updates:
+
+  # NuGet — backend
+  - package-ecosystem: nuget
+    directory: /backend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  # npm — frontend
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  # npm — widget
+  - package-ecosystem: npm
+    directory: /widget
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+
+  # Docker
+  - package-ecosystem: docker
+    directory: /backend
+    schedule:
+      interval: monthly
+
+  - package-ecosystem: docker
+    directory: /frontend
+    schedule:
+      interval: monthly
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

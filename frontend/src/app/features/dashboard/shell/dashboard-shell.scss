@@ -67,6 +67,7 @@ $transition-ease:         cubic-bezier(0.4, 0, 0.2, 1);
 .sidebar__logo-link {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   color: var(--color-dark);
   text-decoration: none;
@@ -81,9 +82,12 @@ $transition-ease:         cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar__logo-icon {
-  width: 24px;
-  height: 24px;
+  width: 120px;
   flex-shrink: 0;
+}
+
+.shell--collapsed .sidebar__logo-icon {
+  width: 25px;
 }
 
 .sidebar__logo-text {

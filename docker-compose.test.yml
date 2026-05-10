@@ -1,0 +1,35 @@
+services:
+
+  # Base de données de test — éphémère, détruite après les tests
+  db-test:
+    image: postgres:17-alpine
+    container_name: aireviewhub-db-test
+    environment:
+      POSTGRES_DB:       aireviewhub_test
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: test_password
+    ports:
+      - "5433:5432"   # port différent pour ne pas conflicier avec le dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d aireviewhub_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    tmpfs:
+      - /var/lib/postgresql/data   # ← stockage en RAM, jamais persisté
+
+  # Runner de tests
+  tests:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.test
+    container_name: aireviewhub-tests
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Test
+      - ConnectionStrings__DefaultConnection=Host=db-test;Port=5432;Database=aireviewhub_test;Username=postgres;Password=test_password
+    depends_on:
+      db-test:
+        condition: service_healthy
+    volumes:
+      - ./backend/TestResults:/app/TestResults   # récupère les résultats

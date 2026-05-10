@@ -1,0 +1,193 @@
+name: CI — Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+
+  # ── Tests Backend ──────────────────────────────────────────
+  test-backend:
+    name: Tests .NET
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: backend
+
+      - name: Build
+        run: dotnet build --no-restore -c Release
+        working-directory: backend
+
+      - name: Run unit tests
+        run: |
+          dotnet test AiReviewHub.Tests/AiReviewHub.Tests.csproj \
+            --no-restore \
+            --verbosity normal \
+            --logger "trx;LogFileName=results.trx" \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./TestResults
+        working-directory: backend
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-test-results
+          path: backend/TestResults/
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage
+          path: backend/TestResults/**/coverage.cobertura.xml
+
+  # ── Tests Backend avec PostgreSQL réel ────────────────────
+  test-backend-integration:
+    name: Tests intégration .NET + PostgreSQL
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB:       aireviewhub_test
+          POSTGRES_USER:     postgres
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+
+      - name: Restore
+        run: dotnet restore
+        working-directory: backend
+
+      - name: Run integration tests
+        env:
+          ASPNETCORE_ENVIRONMENT: Test
+          ConnectionStrings__DefaultConnection: >-
+            Host=localhost;Port=5433;Database=aireviewhub_test;
+            Username=postgres;Password=test_password
+        run: |
+          dotnet test AiReviewHub.Tests/AiReviewHub.Tests.csproj \
+            --no-restore \
+            --verbosity normal \
+            --filter "Category=Integration"
+        working-directory: backend
+
+  # ── Tests Frontend ─────────────────────────────────────────
+  test-frontend:
+    name: Tests Angular
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Lint
+        run: npx ng lint
+        working-directory: frontend
+
+      - name: Run tests
+        run: npx vitest run --reporter=verbose
+        working-directory: frontend
+
+      - name: Build check
+        run: npm run build -- --configuration production
+        working-directory: frontend
+
+  # ── Lint Widget ────────────────────────────────────────────
+  test-widget:
+    name: Build Widget
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: widget/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: widget
+
+      - name: Build widget
+        run: npm run build
+        working-directory: widget
+
+      - name: Upload widget artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: widget-dist
+          path: widget/dist/
+
+          
+  auto-merge-dependabot:
+    name: Auto-merge Dependabot
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend, test-widget]
+    if: github.actor == 'dependabot[bot]'
+    permissions:
+      pull-requests: write
+      contents: write
+
+    steps:
+      - name: Auto-merge
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
