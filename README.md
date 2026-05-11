@@ -1,6 +1,6 @@
-# AiReviewHub
+# FeedXAi
 
-AiReviewHub est une plateforme SaaS moderne de collecte, centralisation et analyse intelligente de feedback client.
+FeedXAi est une plateforme SaaS moderne de collecte, centralisation et analyse intelligente de feedback client.
 
 ## 🚀 Objectif
 
@@ -104,95 +104,6 @@ AiReviewHub/
 
 ---
 
-# 📦 Installation locale
-
-## Prérequis
-
-* .NET SDK 9
-* Node.js 20+
-* PostgreSQL
-* Docker (optionnel)
-* Compte OpenAI API
-
----
-
-## Backend
-
-```bash
-git clone <repo-url>
-cd AiReviewHub
-```
-
-### Configuration :
-
-Créer `appsettings.Development.json`
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=AiReviewHub;Username=postgres;Password=yourpassword"
-  },
-  "OpenAI": {
-    "ApiKey": "your-api-key",
-    "Model": "gpt-5-mini",
-    "MaxTokens": 300,
-    "TimeoutSeconds": 30
-  }
-}
-```
-
-### Migration DB :
-
-```bash
-dotnet ef database update --project AiReviewHub.Infrastructure --startup-project AiReviewHub.API
-```
-
-### Lancer API :
-
-```bash
-dotnet run --project AiReviewHub.API
-```
-
----
-
-## Frontend Angular
-
-```bash
-cd frontend
-npm install
-ng serve
-```
-
----
-
-# 🧪 Tests
-
-## Backend
-
-```bash
-dotnet test
-```
-
-## Frontend
-
-```bash
-npm run test
-```
-
----
-
-# 🌍 Déploiement
-
-## Recommandé :
-
-* **Frontend** : Vercel / Netlify
-* **API** : Docker + VPS / Azure / Railway
-* **DB** : PostgreSQL managed
-* **Background jobs** : Hangfire Dashboard
-* **Widget CDN** : domaine dédié (`widget.aireviewhub.com`)
-
----
-
 # 🔐 Sécurité
 
 * Tokens publics isolés par projet
@@ -215,7 +126,7 @@ npm run test
 * [x] Dashboard
 * [ ] Billing Stripe
 * [ ] Notifications email
-* [ ] Export CSV
+* [x] Export CSV
 * [ ] Multi-language widget
 
 ---
@@ -257,10 +168,10 @@ Propriétaire — Tous droits réservés.
 
 # 👤 Auteur
 
-Développé par l’équipe AiReviewHub.
+Développé par Sofian Belbacha.
 
 ---
 
 # 💡 Vision
 
-AiReviewHub vise à devenir une solution complète de Voice of Customer assistée par IA, simple à intégrer, performante et scalable.
+FeedXAi vise à devenir une solution complète de Voice of Customer assistée par IA, simple à intégrer, performante et scalable.
