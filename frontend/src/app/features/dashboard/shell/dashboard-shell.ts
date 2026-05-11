@@ -54,7 +54,6 @@ export class DashboardShell {
   logout(): void {
     if (this.logoutLoading()) return; // évite double-clic
     this.logoutLoading.set(true);
-
     // AuthService gère le revoke + redirect /login
     this.auth.logout();
   }

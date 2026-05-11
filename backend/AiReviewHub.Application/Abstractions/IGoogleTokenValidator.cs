@@ -11,9 +11,11 @@ namespace AiReviewHub.Application.Abstractions
 
     public record GoogleUserInfo(
         string Email,
-        string FirstName,
-        string LastName,
         string GoogleId,
-        bool EmailVerified
+        bool EmailVerified,
+        string? FirstName = null,
+        string? LastName = null,
+        string? FullName = null
+
     );
 }

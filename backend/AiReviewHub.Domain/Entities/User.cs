@@ -60,8 +60,7 @@ namespace AiReviewHub.Domain.Entities
             if (string.IsNullOrWhiteSpace(firstName))
                 throw new ArgumentException("First name cannot be empty");
 
-            if (string.IsNullOrWhiteSpace(lastName))
-                throw new ArgumentException("Last name cannot be empty");
+            lastName = lastName?.Trim() ?? string.Empty;
 
             if (string.IsNullOrWhiteSpace(googleId))
                 throw new ArgumentException("Google ID cannot be empty");
@@ -72,7 +71,7 @@ namespace AiReviewHub.Domain.Entities
                 Email = Email.Create(email),
                 PasswordHash = null, // pas de mot de passe pour OAuth
                 FirstName = firstName.Trim(),
-                LastName = lastName.Trim(),
+                LastName = lastName.Trim() ?? string.Empty,
                 GoogleId = googleId,
                 Plan = Plan.Free,
                 CreatedAt = now

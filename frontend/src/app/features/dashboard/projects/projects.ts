@@ -133,7 +133,7 @@ export class Projects implements OnInit {
   openFeedbacks(project: Project): void {
     this.dashboardContext.setProject(project);
     this.router.navigate([
-      '/dashboard/projects', project.id, 'feedbacks'
+      '/dashboard/feedbacks'
     ]);
   }
 

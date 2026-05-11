@@ -27,6 +27,7 @@ export const routes: Routes = [
         children: [
             { path: '', loadComponent: () => import('./features/dashboard/overview/overview').then(m => m.Overview) },
             { path: 'projects', loadComponent: () => import('./features/dashboard/projects/projects').then(m => m.Projects) },
+            { path: 'feedbacks', loadComponent: () => import('./features/dashboard/feedbacks/feedbacks').then(m => m.Feedbacks) },
             { path: 'projects/:projectId/feedbacks', loadComponent: () => import('./features/dashboard/feedbacks/feedbacks').then(m => m.Feedbacks) },
             { path: 'trends', loadComponent: () => import('./features/dashboard/trends/trends').then(m => m.Trends) },
             { path: 'widget', loadComponent: () => import('./features/dashboard/widget/widget').then(m => m.Widget)}

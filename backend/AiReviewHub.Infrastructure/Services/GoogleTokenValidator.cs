@@ -36,10 +36,11 @@ namespace AiReviewHub.Infrastructure.Services
 
             return new GoogleUserInfo(
                 payload.Email,
-                payload.GivenName ?? string.Empty,
-                payload.FamilyName ?? string.Empty,
                 payload.Subject,
-                payload.EmailVerified
+                payload.EmailVerified,
+                payload.GivenName,
+                payload.FamilyName,
+                payload.Name
             );
         }
     }

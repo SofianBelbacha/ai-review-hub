@@ -1,11 +1,11 @@
-import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, interval, switchMap, takeWhile, Subscription } from 'rxjs';
 import { FeedbacksService } from './feedbacks.service';
 import { Feedback, FeedbackCategory, FeedbackFilters, FeedbackPriority, FeedbackStatus } from './feedbacks.types';
 import { UserService } from '../../../core/services/user.service';
+import { DashboardContextService } from '../../../core/services/dashboard-context.service';
 
 @Component({
   selector: 'app-feedbacks',
@@ -15,10 +15,10 @@ import { UserService } from '../../../core/services/user.service';
 })
 export class Feedbacks implements OnInit, OnDestroy {
   private readonly service = inject(FeedbacksService);
-  private readonly route = inject(ActivatedRoute);
   private readonly search$ = new Subject<string>();
   private pollSub?: Subscription;
   private readonly userService = inject(UserService);
+  private readonly dashboardContext = inject(DashboardContextService);
   readonly isPro = computed(() =>
     this.userService.profile()?.plan !== 'Free'
   );
@@ -62,11 +62,25 @@ export class Feedbacks implements OnInit, OnDestroy {
   readonly priorities: FeedbackPriority[] = [
     'Critical', 'High', 'Normal', 'Low'];
 
+
+  constructor() {
+    effect(() => {
+      const project = this.dashboardContext.selectedProject();
+
+      if (!project?.id) {
+        this.feedbacks.set([]);
+        this.totalCount.set(0);
+        this.loading.set(false);
+        return;
+      }
+
+      this.currentPage.set(1);
+      this.load();
+    });
+  }
+
   // ─── Lifecycle ────────────────────────────────────────────
   ngOnInit(): void {
-    this.load();
-
-    // Debounce sur la recherche
     this.search$.pipe(
       debounceTime(300),
       distinctUntilChanged()
@@ -83,10 +97,18 @@ export class Feedbacks implements OnInit, OnDestroy {
 
   // ─── Chargement ───────────────────────────────────────────
   get projectId(): string {
-    return this.route.snapshot.paramMap.get('projectId') ?? '';
+    return this.dashboardContext.selectedProject()?.id ?? '';
   }
 
   load(): void {
+    if (!this.projectId) {
+      this.feedbacks.set([]);
+      this.totalCount.set(0);
+      this.loading.set(false);
+      this.error.set('Aucun projet sélectionné.');
+      return;
+    }
+
     this.loading.set(true);
     this.error.set('');
 

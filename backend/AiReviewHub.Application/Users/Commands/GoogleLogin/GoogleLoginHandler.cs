@@ -48,11 +48,17 @@ namespace AiReviewHub.Application.Users.Commands.GoogleLogin
 
             if (user is null)
             {
+                var (firstName, lastName) = NormalizeName(
+                    googleUser.FirstName,
+                    googleUser.LastName,
+                    googleUser.FullName
+                );
+
                 // Nouvel utilisateur via Google — pas de mot de passe
                 user = User.CreateWithGoogle(
                     email.Value,
-                    googleUser.FirstName,
-                    googleUser.LastName,
+                    firstName,
+                    lastName,
                     googleUser.GoogleId,
                     now
                 );
@@ -81,6 +87,31 @@ namespace AiReviewHub.Application.Users.Commands.GoogleLogin
                 session.RawRefreshToken,
                 isNewUser
             );
+        }
+
+        private static (string firstName, string lastName) NormalizeName(
+            string? firstName,
+            string? lastName,
+            string? fullName)
+        {
+            if (!string.IsNullOrWhiteSpace(firstName) || !string.IsNullOrWhiteSpace(lastName))
+            {
+                return (
+                    firstName?.Trim() ?? "User",
+                    lastName?.Trim() ?? ""
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(fullName))
+                return ("User", "");
+
+            var parts = fullName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            return parts.Length switch
+            {
+                1 => (parts[0], ""),
+                _ => (parts[0], string.Join(' ', parts.Skip(1)))
+            };
         }
     }
 }
