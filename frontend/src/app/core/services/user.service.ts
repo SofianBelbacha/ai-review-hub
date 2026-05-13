@@ -16,9 +16,7 @@ export class UserService {
   private readonly _profile = signal<UserProfile | null>(this.decodeProfile());
 
   readonly profile  = this._profile.asReadonly();
-
-  // ─── Expose userId en lecture directe (utilisé par DashboardContextService) ──
-  readonly userId = computed(() => this._profile()?.id ?? null);
+  readonly userId   = computed(() => this._profile()?.id ?? null);
 
   readonly fullName = computed(() => {
     const p = this._profile();
@@ -43,18 +41,12 @@ export class UserService {
   private decodeProfile(): UserProfile | null {
     const token = this.storage.getAccessToken();
     if (!token) return null;
-
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-
-      const id = payload[
-        'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
-      ] ?? payload.sub ?? '';
-
-      const email = payload[
-        'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'
-      ] ?? payload.email ?? '';
-
+      const id = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']
+        ?? payload.sub ?? '';
+      const email = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']
+        ?? payload.email ?? '';
       return {
         id,
         email,

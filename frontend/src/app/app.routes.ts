@@ -33,6 +33,8 @@ export const routes: Routes = [
             { path: 'widget', loadComponent: () => import('./features/dashboard/widget/widget').then(m => m.Widget)}
 
         ]
-    }
+    },
+
+    { path: '**', redirectTo: '' }
 
 ];

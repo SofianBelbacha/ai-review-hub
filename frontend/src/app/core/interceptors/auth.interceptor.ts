@@ -3,11 +3,12 @@ import { inject } from '@angular/core';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { TokenStorageService } from '../services/token-storage.service';
+import { RawHttpService } from '../services/raw-http.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth    = inject(AuthService);
   const storage = inject(TokenStorageService);
-  const rawHttp = new HttpClient(inject(HttpBackend));
+  const rawHttpSvc = inject(RawHttpService); // ← singleton, pas recréé à chaque requête
 
   // Bypass pour les routes publiques
   const publicRoutes = ['/auth/login', '/auth/register', '/auth/google', '/auth/refresh'];
@@ -19,7 +20,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   // Refresh proactif — token expire dans moins de 60s
   if (token && storage.isTokenExpiringSoon(60)) {
-    return auth.refreshTokens(rawHttp).pipe(
+    return auth.refreshTokens(rawHttpSvc.client).pipe(
       switchMap(tokens => {
         const proactiveReq = req.clone({
           setHeaders: { Authorization: `Bearer ${tokens.accessToken}` }
@@ -40,7 +41,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401 && auth.getAccessToken()) {
-        return auth.refreshTokens(rawHttp).pipe(
+        return auth.refreshTokens(rawHttpSvc.client).pipe(
           switchMap(tokens => {
             const retried = req.clone({
               setHeaders: { Authorization: `Bearer ${tokens.accessToken}` }

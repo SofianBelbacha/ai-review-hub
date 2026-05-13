@@ -7,9 +7,13 @@
       <p class="projects__subtitle">
         {{ activeProjects().length }} projet{{ activeProjects().length > 1 ? 's' : '' }} actif{{ activeProjects().length
         > 1 ? 's' : '' }}
-        @if (plan() === 'Free') {
+        @if (plan() === 'Free' || plan() === 'Pro') {
         <span class="projects__limit-badge">
-          Plan Free — {{ projects().length }}/{{ projectLimit() }}
+          Plan {{ plan() }} — {{ projects().length }}/{{ projectLimit() }}
+        </span>
+        } @else {
+        <span class="projects__limit-badge">
+          Plan {{ plan() }} — {{ activeProjects().length }}/ ∞ 
         </span>
         }
       </p>

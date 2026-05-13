@@ -1,12 +1,20 @@
-import { Component, OnInit, OnDestroy, inject, signal, computed, effect } from '@angular/core';
+import {
+  Component, OnInit, OnDestroy, inject, signal, computed,
+  effect, Injector
+} from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subject, debounceTime, distinctUntilChanged, interval, switchMap, takeWhile, Subscription } from 'rxjs';
+import {
+  Subject, debounceTime, distinctUntilChanged,
+  interval, switchMap, takeWhile, Subscription
+} from 'rxjs';
 import { FeedbacksService } from './feedbacks.service';
-import { Feedback, FeedbackCategory, FeedbackFilters, FeedbackPriority, FeedbackStatus } from './feedbacks.types';
+import {
+  Feedback, FeedbackCategory, FeedbackFilters,
+  FeedbackPriority, FeedbackStatus
+} from './feedbacks.types';
 import { UserService } from '../../../core/services/user.service';
 import { DashboardContextService } from '../../../core/services/dashboard-context.service';
-import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-feedbacks',
@@ -16,32 +24,30 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class Feedbacks implements OnInit, OnDestroy {
   private readonly service          = inject(FeedbacksService);
+  private readonly injector         = inject(Injector);
   private readonly userService      = inject(UserService);
   private readonly dashboardContext = inject(DashboardContextService);
-  private readonly auth             = inject(AuthService);
-
-  private readonly search$ = new Subject<string>();
+  private readonly search$          = new Subject<string>();
   private pollSub?: Subscription;
-  private logoutSub?: Subscription;
 
   readonly isPro = computed(() => this.userService.profile()?.plan !== 'Free');
 
-  // ─── State ────────────────────────────────────────────────
-  loading       = signal(true);
-  error         = signal('');
-  feedbacks     = signal<Feedback[]>([]);
-  totalCount    = signal(0);
-  dragging      = signal<Feedback | null>(null);
-  exporting     = signal(false);
+  // ─── State ────────────────────────────────────────────────────────────────
+  loading    = signal(true);
+  error      = signal('');
+  feedbacks  = signal<Feedback[]>([]);
+  totalCount = signal(0);
+  dragging   = signal<Feedback | null>(null);
+  exporting  = signal(false);
 
-  // ─── Filtres ──────────────────────────────────────────────
+  // ─── Filtres ──────────────────────────────────────────────────────────────
   searchValue    = signal('');
   categoryFilter = signal<FeedbackCategory | ''>('');
   priorityFilter = signal<FeedbackPriority | ''>('');
   currentPage    = signal(1);
   readonly pageSize = 50;
 
-  // ─── Colonnes kanban ──────────────────────────────────────
+  // ─── Colonnes kanban ──────────────────────────────────────────────────────
   readonly columns: { status: FeedbackStatus; label: string; color: string }[] = [
     { status: 'Todo',       label: 'À traiter', color: 'amber'   },
     { status: 'InProgress', label: 'En cours',  color: 'violet'  },
@@ -51,16 +57,19 @@ export class Feedbacks implements OnInit, OnDestroy {
   readonly todoFeedbacks       = computed(() => this.feedbacks().filter(f => f.status === 'Todo'));
   readonly inProgressFeedbacks = computed(() => this.feedbacks().filter(f => f.status === 'InProgress'));
   readonly doneFeedbacks       = computed(() => this.feedbacks().filter(f => f.status === 'Done'));
-  readonly hasActiveFilters    = computed(() =>
+
+  readonly hasActiveFilters = computed(() =>
     !!this.searchValue() || !!this.categoryFilter() || !!this.priorityFilter()
   );
 
   readonly categories: FeedbackCategory[] = ['Bug', 'FeatureRequest', 'Question', 'Uncategorized'];
   readonly priorities: FeedbackPriority[] = ['Critical', 'High', 'Normal', 'Low'];
 
-  constructor() {
-    // Re-charge quand le projet actif change (ex. : changement de projet
-    // dans la sidebar, ou chargement du bon projet après login).
+  // ─── Lifecycle ────────────────────────────────────────────────────────────
+  ngOnInit(): void {
+    // effect() déclaré dans ngOnInit avec { injector } — compatible Angular 18/19.
+    // Dans le constructor, le contexte d'injection n'est plus garanti pour effect()
+    // depuis Angular 18, ce qui génère une erreur en mode strict.
     effect(() => {
       const project = this.dashboardContext.selectedProject();
 
@@ -73,43 +82,23 @@ export class Feedbacks implements OnInit, OnDestroy {
 
       this.currentPage.set(1);
       this.load();
+    }, { injector: this.injector });
+
+    this.search$.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(() => {
+      this.currentPage.set(1);
+      this.load();
     });
-  }
-
-  // ─── Lifecycle ────────────────────────────────────────────
-  ngOnInit(): void {
-    this.search$.pipe(debounceTime(300), distinctUntilChanged())
-      .subscribe(() => {
-        this.currentPage.set(1);
-        this.load();
-      });
-
-    // Vide tout en mémoire au logout : arrête le polling,
-    // efface les données, évite tout flash de l'ancien compte.
-    this.logoutSub = this.auth.logout$.subscribe(() => this.resetState());
   }
 
   ngOnDestroy(): void {
     this.pollSub?.unsubscribe();
-    this.logoutSub?.unsubscribe();
     this.search$.complete();
   }
 
-  private resetState(): void {
-    this.pollSub?.unsubscribe();
-    this.pollSub = undefined;
-    this.feedbacks.set([]);
-    this.totalCount.set(0);
-    this.loading.set(false);
-    this.error.set('');
-    this.searchValue.set('');
-    this.categoryFilter.set('');
-    this.priorityFilter.set('');
-    this.dragging.set(null);
-    this.exporting.set(false);
-  }
-
-  // ─── Chargement ───────────────────────────────────────────
+  // ─── Chargement ───────────────────────────────────────────────────────────
   get projectId(): string {
     return this.dashboardContext.selectedProject()?.id ?? '';
   }
@@ -148,7 +137,7 @@ export class Feedbacks implements OnInit, OnDestroy {
     });
   }
 
-  // ─── Polling IA ───────────────────────────────────────────
+  // ─── Polling IA ───────────────────────────────────────────────────────────
   private startPollingIfNeeded(): void {
     const hasPending = this.feedbacks().some(
       f => f.aiAnalysisStatus === 'Pending' || f.aiAnalysisStatus === 'Processing'
@@ -167,10 +156,9 @@ export class Feedbacks implements OnInit, OnDestroy {
     this.pollSub = interval(3000).pipe(
       switchMap(() => this.service.getAll(this.projectId, filters)),
       takeWhile(result =>
-        result.data.some(f =>
-          f.aiAnalysisStatus === 'Pending' || f.aiAnalysisStatus === 'Processing'
-        ), true
-      )
+        result.data.some(
+          f => f.aiAnalysisStatus === 'Pending' || f.aiAnalysisStatus === 'Processing'
+        ), true)
     ).subscribe({
       next: (result) => {
         this.feedbacks.set(result.data);
@@ -185,7 +173,7 @@ export class Feedbacks implements OnInit, OnDestroy {
     });
   }
 
-  // ─── Filtres ──────────────────────────────────────────────
+  // ─── Filtres ──────────────────────────────────────────────────────────────
   onSearch(value: string): void {
     this.searchValue.set(value);
     this.search$.next(value);
@@ -211,10 +199,9 @@ export class Feedbacks implements OnInit, OnDestroy {
     this.load();
   }
 
-  // ─── Drag & Drop ──────────────────────────────────────────
+  // ─── Drag & Drop ──────────────────────────────────────────────────────────
   onDragStart(feedback: Feedback): void { this.dragging.set(feedback); }
-  onDragEnd(): void { this.dragging.set(null); }
-  onDragOver(event: DragEvent): void { event.preventDefault(); }
+  onDragEnd():                     void { this.dragging.set(null); }
 
   onDrop(status: FeedbackStatus): void {
     const fb = this.dragging();
@@ -225,13 +212,17 @@ export class Feedbacks implements OnInit, OnDestroy {
 
     this.service.updateStatus(this.projectId, fb.id, status).subscribe({
       error: () => {
-        this.feedbacks.update(list => list.map(f => f.id === fb.id ? { ...f, status: fb.status } : f));
+        this.feedbacks.update(list =>
+          list.map(f => f.id === fb.id ? { ...f, status: fb.status } : f)
+        );
         this.error.set('Impossible de mettre à jour le statut.');
       }
     });
   }
 
-  // ─── Helpers ──────────────────────────────────────────────
+  onDragOver(event: DragEvent): void { event.preventDefault(); }
+
+  // ─── Helpers ──────────────────────────────────────────────────────────────
   getCategoryLabel(category: string): string {
     const map: Record<string, string> = {
       Bug: '🐛 Bug', FeatureRequest: '✨ Feature',
@@ -266,17 +257,14 @@ export class Feedbacks implements OnInit, OnDestroy {
     if (this.exporting()) return;
     this.exporting.set(true);
 
-    const filters = {
+    this.service.exportCsv(this.projectId, {
       category: this.categoryFilter() || undefined,
       priority: this.priorityFilter() || undefined,
-      status: undefined,
-    };
-
-    this.service.exportCsv(this.projectId, filters).subscribe({
+    }).subscribe({
       next: (blob) => {
         const url  = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.href = url;
+        link.href     = url;
         link.download = `feedbacks_${new Date().toISOString().slice(0, 10)}.csv`;
         link.click();
         URL.revokeObjectURL(url);
