@@ -173,6 +173,51 @@
           <p class="fb-card__original">{{ fb.content }}</p>
           }
 
+          <!-- fb-card — section Pro/Team -->
+          @if (fb.aiAnalysisStatus === 'Completed' && fb.priorityScore !== null) {
+
+            <!-- Score de priorité Pro -->
+            <div class="fb-card__pro-info">
+
+              <!-- Barre de score -->
+              <div class="fb-card__score">
+                <span class="fb-card__score-label">Score</span>
+                <div class="fb-card__score-bar">
+                  <div
+                    class="fb-card__score-fill"
+                    [style.width.%]="fb.priorityScore"
+                    [class.fb-card__score-fill--critical]="(fb.priorityScore ?? 0) >= 76"
+                    [class.fb-card__score-fill--high]="(fb.priorityScore ?? 0) >= 51 && (fb.priorityScore ?? 0) < 76"
+                    [class.fb-card__score-fill--normal]="(fb.priorityScore ?? 0) < 51">
+                  </div>
+                </div>
+                <span class="fb-card__score-value">{{ fb.priorityScore }}/100</span>
+              </div>
+
+              <!-- Sentiment -->
+              @if (fb.sentiment) {
+                <span class="fb-card__sentiment" [attr.data-sentiment]="fb.sentiment">
+                  {{ getSentimentEmoji(fb.sentiment) }} {{ fb.sentiment }}
+                </span>
+              }
+
+              <!-- Action required -->
+              @if (fb.actionRequired) {
+                <span class="fb-card__action-badge">⚡ Action requise</span>
+              }
+
+              <!-- Key topics -->
+              @if (fb.keyTopics && fb.keyTopics.length > 0) {
+                <div class="fb-card__topics">
+                  @for (topic of fb.keyTopics; track topic) {
+                    <span class="fb-card__topic">{{ topic }}</span>
+                  }
+                </div>
+              }
+
+            </div>
+          }
+
           <!-- Meta -->
           <div class="fb-card__meta">
             <span class="fb-card__category">

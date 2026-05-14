@@ -23,40 +23,40 @@ import { DashboardContextService } from '../../../core/services/dashboard-contex
   styleUrl: './feedbacks.scss',
 })
 export class Feedbacks implements OnInit, OnDestroy {
-  private readonly service          = inject(FeedbacksService);
-  private readonly injector         = inject(Injector);
-  private readonly userService      = inject(UserService);
+  private readonly service = inject(FeedbacksService);
+  private readonly injector = inject(Injector);
+  private readonly userService = inject(UserService);
   private readonly dashboardContext = inject(DashboardContextService);
-  private readonly search$          = new Subject<string>();
+  private readonly search$ = new Subject<string>();
   private pollSub?: Subscription;
 
   readonly isPro = computed(() => this.userService.profile()?.plan !== 'Free');
 
   // ─── State ────────────────────────────────────────────────────────────────
-  loading    = signal(true);
-  error      = signal('');
-  feedbacks  = signal<Feedback[]>([]);
+  loading = signal(true);
+  error = signal('');
+  feedbacks = signal<Feedback[]>([]);
   totalCount = signal(0);
-  dragging   = signal<Feedback | null>(null);
-  exporting  = signal(false);
+  dragging = signal<Feedback | null>(null);
+  exporting = signal(false);
 
   // ─── Filtres ──────────────────────────────────────────────────────────────
-  searchValue    = signal('');
+  searchValue = signal('');
   categoryFilter = signal<FeedbackCategory | ''>('');
   priorityFilter = signal<FeedbackPriority | ''>('');
-  currentPage    = signal(1);
+  currentPage = signal(1);
   readonly pageSize = 50;
 
   // ─── Colonnes kanban ──────────────────────────────────────────────────────
   readonly columns: { status: FeedbackStatus; label: string; color: string }[] = [
-    { status: 'Todo',       label: 'À traiter', color: 'amber'   },
-    { status: 'InProgress', label: 'En cours',  color: 'violet'  },
-    { status: 'Done',       label: 'Résolus',   color: 'emerald' },
+    { status: 'Todo', label: 'À traiter', color: 'amber' },
+    { status: 'InProgress', label: 'En cours', color: 'violet' },
+    { status: 'Done', label: 'Résolus', color: 'emerald' },
   ];
 
-  readonly todoFeedbacks       = computed(() => this.feedbacks().filter(f => f.status === 'Todo'));
+  readonly todoFeedbacks = computed(() => this.feedbacks().filter(f => f.status === 'Todo'));
   readonly inProgressFeedbacks = computed(() => this.feedbacks().filter(f => f.status === 'InProgress'));
-  readonly doneFeedbacks       = computed(() => this.feedbacks().filter(f => f.status === 'Done'));
+  readonly doneFeedbacks = computed(() => this.feedbacks().filter(f => f.status === 'Done'));
 
   readonly hasActiveFilters = computed(() =>
     !!this.searchValue() || !!this.categoryFilter() || !!this.priorityFilter()
@@ -116,10 +116,10 @@ export class Feedbacks implements OnInit, OnDestroy {
     this.error.set('');
 
     const filters: FeedbackFilters = {
-      search:   this.searchValue(),
+      search: this.searchValue(),
       category: this.categoryFilter() || undefined,
       priority: this.priorityFilter() || undefined,
-      page:     this.currentPage(),
+      page: this.currentPage(),
       pageSize: this.pageSize,
     };
 
@@ -146,10 +146,10 @@ export class Feedbacks implements OnInit, OnDestroy {
     if (!hasPending || this.pollSub) return;
 
     const filters: FeedbackFilters = {
-      search:   this.searchValue(),
+      search: this.searchValue(),
       category: this.categoryFilter() || undefined,
       priority: this.priorityFilter() || undefined,
-      page:     this.currentPage(),
+      page: this.currentPage(),
       pageSize: this.pageSize,
     };
 
@@ -201,7 +201,7 @@ export class Feedbacks implements OnInit, OnDestroy {
 
   // ─── Drag & Drop ──────────────────────────────────────────────────────────
   onDragStart(feedback: Feedback): void { this.dragging.set(feedback); }
-  onDragEnd():                     void { this.dragging.set(null); }
+  onDragEnd(): void { this.dragging.set(null); }
 
   onDrop(status: FeedbackStatus): void {
     const fb = this.dragging();
@@ -262,9 +262,9 @@ export class Feedbacks implements OnInit, OnDestroy {
       priority: this.priorityFilter() || undefined,
     }).subscribe({
       next: (blob) => {
-        const url  = URL.createObjectURL(blob);
+        const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.href     = url;
+        link.href = url;
         link.download = `feedbacks_${new Date().toISOString().slice(0, 10)}.csv`;
         link.click();
         URL.revokeObjectURL(url);
@@ -279,5 +279,16 @@ export class Feedbacks implements OnInit, OnDestroy {
         );
       }
     });
+  }
+
+  // helper sentiment
+  getSentimentEmoji(sentiment: string): string {
+    const map: Record<string, string> = {
+      Positive: '😊',
+      Neutral: '😐',
+      Negative: '😞',
+      Frustrated: '😤',
+    };
+    return map[sentiment] ?? '😐';
   }
 }

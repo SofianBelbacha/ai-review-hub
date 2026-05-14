@@ -29,6 +29,15 @@ namespace AiReviewHub.Domain.Entities
         public AiAnalysisStatus AiAnalysisStatus { get; private set; }
         public string? AiAnalysisError { get; private set; }
 
+        // ── Champs Pro/Team uniquement ────────────────────────
+        public int? PriorityScore { get; private set; } // 0-100
+        public string? Sentiment { get; private set; } // Positive/Neutral/Negative/Frustrated
+        public int? SentimentScore { get; private set; } // -100 à 100
+        public string? KeyTopics { get; private set; } // JSON array stocké en string
+        public bool? ActionRequired { get; private set; }
+        public string? Urgency { get; private set; } // Low/Medium/High/Immediate
+
+
 
         private Feedback() { }
 
@@ -70,7 +79,13 @@ namespace AiReviewHub.Domain.Entities
         }
 
 
-        public void EnrichWithAi(FeedbackCategory category, FeedbackPriority priority, string summary, DateTime now)
+        public void EnrichWithAi(FeedbackCategory category, FeedbackPriority priority, string summary, DateTime now, 
+            int? priorityScore = null,
+            string? sentiment = null,
+            int? sentimentScore = null,
+            string[]? keyTopics = null,
+            bool? actionRequired = null,
+            string? urgency = null)
         {
             if (string.IsNullOrWhiteSpace(summary))
                 throw new ArgumentException("AI summary cannot be empty");
@@ -81,6 +96,15 @@ namespace AiReviewHub.Domain.Entities
             AiAnalysisStatus = AiAnalysisStatus.Completed; // ← marque comme complété
             AiAnalysisError = null;
             UpdatedAt = now;
+
+            // Champs Pro
+            PriorityScore = priorityScore;
+            Sentiment = sentiment;
+            SentimentScore = sentimentScore;
+            KeyTopics = keyTopics is not null ? System.Text.Json.JsonSerializer.Serialize(keyTopics) : null;
+            ActionRequired = actionRequired;
+            Urgency = urgency;
+
         }
 
         public void UpdateStatus(FeedbackStatus newStatus, DateTime now)

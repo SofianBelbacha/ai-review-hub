@@ -470,3 +470,88 @@
 
   @keyframes spin { to { transform: rotate(360deg); } }
 }
+
+
+// styles Pro
+.fb-card__pro-info {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--color-border-tertiary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.fb-card__score {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fb-card__score-label {
+  font-size: 0.65rem;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.fb-card__score-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--color-background-secondary);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.fb-card__score-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+
+  &--critical { background: #F43F5E; }
+  &--high     { background: #F59E0B; }
+  &--normal   { background: #3B82F6; }
+}
+
+.fb-card__score-value {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.fb-card__sentiment {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+
+  &[data-sentiment="Frustrated"] { color: #F43F5E; }
+  &[data-sentiment="Negative"]   { color: #F59E0B; }
+  &[data-sentiment="Positive"]   { color: #10B981; }
+}
+
+.fb-card__action-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  background: #FFF7ED;
+  color: #C2410C;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.fb-card__topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.fb-card__topic {
+  font-size: 0.65rem;
+  background: var(--color-background-secondary);
+  color: var(--color-text-secondary);
+  padding: 0.15rem 0.4rem;
+  border-radius: 20px;
+  border: 1px solid var(--color-border-tertiary);
+}

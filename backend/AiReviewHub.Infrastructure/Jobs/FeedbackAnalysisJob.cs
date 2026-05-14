@@ -92,7 +92,9 @@ public class FeedbackAnalysisJob
         }
 
         // ── Quota ─────────────────────────────────────────────
-        var user = feedback.Project.User;
+        var user = feedback.Project?.User
+            ?? throw new InvalidOperationException(
+                $"Feedback {feedbackId} has no associated user");
 
         if (!await _quotaService.CanAnalyzeAsync(user.Id, user.Plan))
         {
@@ -115,13 +117,19 @@ public class FeedbackAnalysisJob
         try
         {
             var result = await _aiService.AnalyzeAsync(
-                feedback.Content.Value);
+                feedback.Content.Value, user?.Plan ?? Plan.Free);
 
             feedback.EnrichWithAi(
                 result.Category,
                 result.Priority,
                 result.Summary,
-                _dateTimeProvider.UtcNow
+                _dateTimeProvider.UtcNow,
+                result.PriorityScore,
+                result.Sentiment,
+                result.SentimentScore,
+                result.KeyTopics,
+                result.ActionRequired,
+                result.Urgency
             );
 
             await SaveChangesAsync();

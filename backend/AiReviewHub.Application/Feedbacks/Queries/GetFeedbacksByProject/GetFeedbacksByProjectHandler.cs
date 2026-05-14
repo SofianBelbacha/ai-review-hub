@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 
 namespace AiReviewHub.Application.Feedbacks.Queries.GetFeedbacksByProject
 {
@@ -76,6 +77,15 @@ namespace AiReviewHub.Application.Feedbacks.Queries.GetFeedbacksByProject
                     f.Category.ToString(),
                     f.Priority.ToString(),
                     f.Status.ToString(),
+                    f.AiAnalysisStatus.ToString(),
+                    f.PriorityScore,
+                    f.Sentiment,
+                    f.SentimentScore,
+                    f.KeyTopics is not null
+                        ? JsonSerializer.Deserialize<string[]>(f.KeyTopics) ?? []
+                        : [],
+                    f.ActionRequired,
+                    f.Urgency,
                     f.CreatedAt,
                     f.UpdatedAt
                 ))

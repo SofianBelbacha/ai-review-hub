@@ -29,6 +29,14 @@ namespace AiReviewHub.Application.Feedbacks.Queries.GetFeedbacksByProject
         string Category,
         string Priority,
         string Status,
+        string AiAnalysisStatus,
+        // Champs Pro — null si Free
+        int? PriorityScore,
+        string? Sentiment,
+        int? SentimentScore,
+        string[] KeyTopics,
+        bool? ActionRequired,
+        string? Urgency,
         DateTime CreatedAt,
         DateTime? UpdatedAt
     );

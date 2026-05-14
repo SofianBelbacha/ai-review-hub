@@ -4,15 +4,22 @@ export type FeedbackCategory = 'Bug' | 'FeatureRequest' | 'Question' | 'Uncatego
 export type AiStatus = 'Pending' | 'Processing' | 'Completed' | 'Failed';
 
 export interface Feedback {
-    id: string;
-    content: string;
-    aiSummary: string;
-    category: FeedbackCategory;
-    priority: FeedbackPriority;
-    status: FeedbackStatus;
+    id:               string;
+    content:          string;
+    aiSummary:        string;
+    category:         FeedbackCategory;
+    priority:         FeedbackPriority;
+    status:           FeedbackStatus;
     aiAnalysisStatus: AiStatus;
-    createdAt: string;
-    updatedAt?: string;
+    // Champs Pro
+    priorityScore?:   number;
+    sentiment?:       string;
+    sentimentScore?:  number;
+    keyTopics?:       string[];
+    actionRequired?:  boolean;
+    urgency?:         string;
+    createdAt:        string;
+    updatedAt?:       string;
 }
 
 export interface FeedbackFilters {

@@ -50,6 +50,27 @@ namespace AiReviewHub.Infrastructure.Persistence.Configurations
             builder.Property(f => f.CreatedAt)
                 .IsRequired();
 
+            builder.Property(f => f.PriorityScore)
+                .IsRequired(false);
+
+            builder.Property(f => f.Sentiment)
+                .HasMaxLength(20)
+                .IsRequired(false);
+
+            builder.Property(f => f.SentimentScore)
+                .IsRequired(false);
+
+            builder.Property(f => f.KeyTopics)
+                .HasMaxLength(200) // JSON array
+                .IsRequired(false);
+
+            builder.Property(f => f.ActionRequired)
+                .IsRequired(false);
+
+            builder.Property(f => f.Urgency)
+                .HasMaxLength(20)
+                .IsRequired(false);
+
             builder.HasIndex(f => f.ProjectId);
             builder.HasIndex(f => f.Status);
         }
