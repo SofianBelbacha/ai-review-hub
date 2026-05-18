@@ -1,0 +1,78 @@
+@if (refreshing()) {
+<div class="ps__loading" aria-label="Mise à jour de votre compte…">
+    <div class="ps__loading-spinner"></div>
+</div>
+} @else {
+<div class="ps" [class.ps--step-1]="animationStep() >= 1" ...>
+    <div class="ps" [class.ps--step-1]="animationStep() >= 1" [class.ps--step-2]="animationStep() >= 2"
+        [class.ps--step-3]="animationStep() >= 3">
+
+        <!-- Fond animé -->
+        <div class="ps__bg" aria-hidden="true">
+            <div class="ps__bg-ring ps__bg-ring--1"></div>
+            <div class="ps__bg-ring ps__bg-ring--2"></div>
+            <div class="ps__bg-ring ps__bg-ring--3"></div>
+            <div class="ps__bg-dots"></div>
+        </div>
+
+        <div class="ps__wrapper">
+
+            <!-- Icône de succès -->
+            <div class="ps__icon-wrap">
+                <div class="ps__icon">
+                    <svg class="ps__icon-check" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle class="ps__icon-circle" cx="26" cy="26" r="24" stroke="currentColor"
+                            stroke-width="2.5" />
+                        <polyline class="ps__icon-tick" points="14,27 22,35 38,18" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Titre & sous-titre -->
+            <div class="ps__header">
+                <div class="ps__plan-badge">
+                    <span>{{ currentPlan().emoji }}</span>
+                    <span>Plan {{ currentPlan().name }}</span>
+                </div>
+                <h1 class="ps__title">Paiement confirmé</h1>
+                <p class="ps__subtitle">
+                    Bienvenue dans le plan <strong>{{ currentPlan().name }}</strong>.
+                    Votre compte a été mis à niveau instantanément.
+                </p>
+            </div>
+
+            <!-- Carte des fonctionnalités débloquées -->
+            <div class="ps__card">
+                <p class="ps__card-label">Ce qui vient d'être débloqué</p>
+                <ul class="ps__features">
+                    @for (feature of currentPlan().features; track feature; let i = $index) {
+                    <li class="ps__feature" [style.--i]="i">
+                        <span class="ps__feature-dot" aria-hidden="true"></span>
+                        {{ feature }}
+                    </li>
+                    }
+                </ul>
+            </div>
+
+            <!-- Actions -->
+            <div class="ps__actions">
+                <a routerLink="/dashboard" class="ps__btn ps__btn--primary">
+                    Accéder au tableau de bord
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 8h10M9 4l4 4-4 4" />
+                    </svg>
+                </a>
+                <a routerLink="/" class="ps__btn ps__btn--ghost">Retour à l'accueil</a>
+            </div>
+
+            <!-- Note de confirmation email -->
+            <p class="ps__note">
+                Un reçu a été envoyé à votre adresse email.
+            </p>
+
+        </div>
+    </div>
+</div>
+}

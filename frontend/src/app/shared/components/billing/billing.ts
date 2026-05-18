@@ -1,4 +1,3 @@
-// frontend/src/app/features/dashboard/billing/billing.ts
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
@@ -49,7 +48,7 @@ export class Billing implements OnInit {
       cta: 'Plan actuel',
     },
     {
-      id: 'pro',
+      id: 'pro' as 'pro' | 'team',
       name: 'Pro',
       price: '9€',
       period: '/ mois',
@@ -69,7 +68,7 @@ export class Billing implements OnInit {
       cta: 'Passer au Pro',
     },
     {
-      id: 'team',
+      id: 'team' as 'pro' | 'team',
       name: 'Team',
       price: '29€',
       period: '/ mois',
@@ -98,12 +97,12 @@ export class Billing implements OnInit {
     }
   }
 
-  upgrade(priceId: string | null): void {
+  upgrade(priceId: string | null, planId: 'pro' | 'team'): void {
     if (!priceId || this.loading()) return;
     this.loading.set(true);
     this.errorMessage.set('');
 
-    this.billing.createCheckoutSession(priceId).subscribe({
+    this.billing.createCheckoutSession(priceId, planId).subscribe({
       next: ({ url }) => { window.location.href = url; },
       error: () => {
         this.loading.set(false);

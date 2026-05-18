@@ -20,8 +20,8 @@ export class BillingService {
   private readonly http = inject(HttpClient);
   private readonly api  = `${environment.apiUrl}/billing`;
 
-  createCheckoutSession(priceId: string): Observable<CheckoutSessionResponse> {
-    const successUrl = `${window.location.origin}/dashboard/billing?success=true`;
+  createCheckoutSession(priceId: string, planId: 'pro' | 'team'): Observable<CheckoutSessionResponse> {
+    const successUrl = `${window.location.origin}/payment-success?plan=${planId}`;
     const cancelUrl  = `${window.location.origin}/dashboard/billing?canceled=true`;
     return this.http.post<CheckoutSessionResponse>(`${this.api}/checkout`, {
       priceId, successUrl, cancelUrl

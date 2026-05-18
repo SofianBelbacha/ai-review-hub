@@ -1,0 +1,379 @@
+/* =============================================
+   PAYMENT SUCCESS — page complète
+   ============================================= */
+
+// Variables locales
+$duration-fast:   0.4s;
+$duration-normal: 0.6s;
+$duration-slow:   0.8s;
+$ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+$ease-out:        cubic-bezier(0.16, 1, 0.3, 1);
+
+// -----------------------------------------------
+// Conteneur principal
+// -----------------------------------------------
+
+.ps__loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ps__loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-dark);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.ps {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  background-color: var(--color-white);
+  overflow: hidden;
+}
+
+// -----------------------------------------------
+// Fond animé — anneaux concentriques
+// -----------------------------------------------
+
+.ps__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ps__bg-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  opacity: 0;
+  transition: transform $duration-slow $ease-out, opacity $duration-slow ease;
+
+  &--1 { width: 320px;  height: 320px;  }
+  &--2 { width: 560px;  height: 560px;  }
+  &--3 { width: 840px;  height: 840px;  }
+}
+
+.ps__bg-dots {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, var(--color-border) 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0;
+  transition: opacity $duration-slow ease 0.2s;
+}
+
+// Activation des anneaux à l'étape 1
+.ps--step-1 {
+  .ps__bg-ring {
+    opacity: 1;
+
+    &--1 { transform: translate(-50%, -50%) scale(1); transition-delay: 0s; }
+    &--2 { transform: translate(-50%, -50%) scale(1); transition-delay: 0.1s; }
+    &--3 { transform: translate(-50%, -50%) scale(1); transition-delay: 0.2s; }
+  }
+
+  .ps__bg-dots { opacity: 0.5; }
+}
+
+// -----------------------------------------------
+// Wrapper du contenu
+// -----------------------------------------------
+
+.ps__wrapper {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+}
+
+// -----------------------------------------------
+// Icône de succès
+// -----------------------------------------------
+
+.ps__icon-wrap {
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity $duration-normal $ease-spring,
+              transform $duration-normal $ease-spring;
+}
+
+.ps--step-1 .ps__icon-wrap {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.ps__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: var(--color-dark);
+  color: var(--color-white);
+  box-shadow:
+    0 0 0 8px rgba(20, 21, 26, 0.06),
+    0 0 0 16px rgba(20, 21, 26, 0.03);
+}
+
+.ps__icon-check {
+  width: 40px;
+  height: 40px;
+}
+
+// Animation du cercle SVG
+.ps__icon-circle {
+  stroke-dasharray: 157;
+  stroke-dashoffset: 157;
+  transition: stroke-dashoffset $duration-slow $ease-out 0.1s;
+}
+
+.ps--step-1 .ps__icon-circle {
+  stroke-dashoffset: 0;
+}
+
+// Animation du tick SVG
+.ps__icon-tick {
+  stroke-dasharray: 36;
+  stroke-dashoffset: 36;
+  transition: stroke-dashoffset $duration-normal $ease-out 0.5s;
+}
+
+.ps--step-1 .ps__icon-tick {
+  stroke-dashoffset: 0;
+}
+
+// -----------------------------------------------
+// En-tête : badge + titre + sous-titre
+// -----------------------------------------------
+
+.ps__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity $duration-normal $ease-out,
+              transform $duration-normal $ease-out;
+}
+
+.ps--step-2 .ps__header {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ps__plan-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface-lt);
+  font-family: var(--font-medium);
+  font-size: 13px;
+  color: var(--color-dark);
+}
+
+.ps__title {
+  font-family: var(--font-base);
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--color-dark);
+}
+
+.ps__subtitle {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-muted);
+  max-width: 360px;
+
+  strong {
+    color: var(--color-dark);
+    font-family: var(--font-medium);
+    font-weight: 500;
+  }
+}
+
+// -----------------------------------------------
+// Carte des fonctionnalités
+// -----------------------------------------------
+
+.ps__card {
+  width: 100%;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface-lt);
+  padding: 24px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity $duration-normal $ease-out 0.1s,
+              transform $duration-normal $ease-out 0.1s;
+}
+
+.ps--step-2 .ps__card {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ps__card-label {
+  font-family: var(--font-medium);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-muted);
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.ps__features {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+// Chaque feature apparaît en cascade (étape 3)
+.ps__feature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--color-dark);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity 0.35s $ease-out calc(var(--i) * 0.08s),
+              transform 0.35s $ease-out calc(var(--i) * 0.08s);
+
+  &:last-child { border-bottom: none; }
+}
+
+.ps--step-3 .ps__feature {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.ps__feature-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-dark);
+  flex-shrink: 0;
+}
+
+// -----------------------------------------------
+// Actions
+// -----------------------------------------------
+
+.ps__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity $duration-normal $ease-out 0.2s,
+              transform $duration-normal $ease-out 0.2s;
+}
+
+.ps--step-3 .ps__actions {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ps__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 24px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-medium);
+  font-size: 15px;
+  text-decoration: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover {
+    opacity: 0.88;
+    svg { transform: translateX(3px); }
+  }
+
+  &--primary {
+    background-color: var(--color-dark);
+    color: var(--color-white);
+    border: none;
+  }
+
+  &--ghost {
+    background-color: transparent;
+    color: var(--color-muted);
+    border: none;
+    font-size: 14px;
+    width: auto;
+    padding: 8px 16px;
+
+    &:hover { color: var(--color-dark); opacity: 1; }
+  }
+}
+
+// -----------------------------------------------
+// Note email
+// -----------------------------------------------
+
+.ps__note {
+  font-size: 13px;
+  color: var(--color-muted);
+  opacity: 0;
+  transition: opacity $duration-normal ease 0.4s;
+}
+
+.ps--step-3 .ps__note {
+  opacity: 1;
+}
+
+// -----------------------------------------------
+// Responsive
+// -----------------------------------------------
+
+@media (max-width: 767px) {
+  .ps__title   { font-size: 32px; }
+  .ps__bg-ring--3 { width: 560px; height: 560px; }
+}
